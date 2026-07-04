@@ -28,37 +28,28 @@
   overflow: hidden;
 }
 
-.chapter__beam {
+/* Large prism anchored to the left edge, half off-canvas, emitting the
+   chapter's light across the hero (scale taken from the Love draft) */
+.chapter__prism {
   position: absolute;
-  top: 24%;
-  left: -6%;
-  width: 46%;
-  height: 130px;
-  background: linear-gradient(
-    100deg,
-    color-mix(in srgb, var(--accent) 55%, transparent),
-    transparent 75%
-  );
-  clip-path: polygon(0 42%, 100% 0, 100% 100%, 0 58%);
-  filter: blur(2px);
-  opacity: 0.55;
+  left: max(-90px, -7vw);
+  top: 16%;
+  width: clamp(200px, 24vw, 340px);
   pointer-events: none;
-}
-
-.chapter__prism-accent {
-  position: absolute;
-  top: var(--space-5);
-  left: var(--space-4);
-  color: var(--accent);
-  opacity: 0.75;
-  pointer-events: none;
+  z-index: 0;
 }
 
 .chapter__hero-grid {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: 0.9fr 1.1fr;
   gap: var(--space-6);
   align-items: center;
+}
+
+.chapter__hero-copy {
+  padding-left: clamp(64px, 9vw, 150px);
 }
 
 .chapter__eyebrow {
@@ -194,28 +185,13 @@
   color: var(--off-white);
 }
 
-.chapter__platforms {
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2) var(--space-3);
-  margin: var(--space-3) 0 0;
-  padding: 0;
-}
-
-.chapter__platforms a {
-  font-size: 11px;
+.chapter__streaming-note {
+  margin-top: var(--space-3);
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  opacity: 0.6;
-  border-bottom: 1px solid transparent;
-  transition: opacity 0.2s;
-}
-
-.chapter__platforms a:hover {
-  opacity: 1;
-  border-bottom-color: currentColor;
+  opacity: 0.45;
 }
 
 .chapter__tracks {
@@ -363,8 +339,14 @@
     grid-template-columns: 1fr;
     gap: var(--space-5);
   }
-  .chapter__prism-accent {
-    display: none;
+  .chapter__prism {
+    width: 160px;
+    left: -60px;
+    top: 4%;
+    opacity: 0.85;
+  }
+  .chapter__hero-copy {
+    padding-left: 0;
   }
 }
 

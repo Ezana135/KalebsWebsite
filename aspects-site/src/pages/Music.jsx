@@ -7,11 +7,13 @@ import Reveal from '../components/Reveal';
 import PrismGlass from '../components/PrismGlass';
 import './music.css';
 
+// Bandcamp carries the catalogue first; wider streaming lands later.
+// Replace-note: set `href` per platform as releases go live.
 const PLATFORMS = [
-  { label: 'Spotify', href: 'https://open.spotify.com' },
-  { label: 'Apple Music', href: 'https://music.apple.com' },
-  { label: 'Bandcamp', href: 'https://bandcamp.com' },
-  { label: 'YouTube', href: 'https://youtube.com' },
+  { label: 'Bandcamp', href: 'https://bandcamp.com', live: true },
+  { label: 'YouTube', href: 'https://youtube.com', live: true },
+  { label: 'Spotify', live: false },
+  { label: 'Apple Music', live: false },
 ];
 
 // Waveform bars for the mock player (deterministic, not random per render).
@@ -113,7 +115,7 @@ export default function Music() {
           <section className="music__player" data-theme={current.id} aria-label="Player">
             <header className="music__player-head">
               <div>
-                <p className="music__player-label">Now playing</p>
+                <p className="music__player-label">Previews</p>
                 <p className="music__player-chapter">{current.title}</p>
               </div>
               <p className="music__player-index">
@@ -199,6 +201,14 @@ export default function Music() {
             <Link to={`/chapters/${current.slug}`} className="link-arrow music__full-chapter">
               View full chapter <span aria-hidden="true">&rarr;</span>
             </Link>
+            {/* Replace-note: preview clips can be wired to real audio files
+                dropped in /public/media/audio/ — full releases stay on Bandcamp */}
+            <p className="music__player-note">
+              Full tracks live on{' '}
+              <a href="https://bandcamp.com" target="_blank" rel="noreferrer">
+                Bandcamp
+              </a>
+            </p>
           </section>
         </Reveal>
       </div>
@@ -206,15 +216,21 @@ export default function Music() {
       {/* PLATFORMS + BANDCAMP + EMAIL */}
       <div className="container music__base">
         <Reveal className="music__platforms">
-          <p className="eyebrow">Listen everywhere</p>
+          <p className="eyebrow">Where to listen</p>
           <ul>
-            {PLATFORMS.map((p) => (
-              <li key={p.label}>
-                <a href={p.href} target="_blank" rel="noreferrer">
-                  {p.label}
-                </a>
-              </li>
-            ))}
+            {PLATFORMS.map((p) =>
+              p.live ? (
+                <li key={p.label}>
+                  <a href={p.href} target="_blank" rel="noreferrer">
+                    {p.label}
+                  </a>
+                </li>
+              ) : (
+                <li key={p.label} className="music__platform-soon">
+                  {p.label} <em>soon</em>
+                </li>
+              )
+            )}
           </ul>
         </Reveal>
 

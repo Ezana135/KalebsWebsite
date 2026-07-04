@@ -367,6 +367,31 @@
   margin-top: var(--space-4);
 }
 
+.music__player-note {
+  margin-top: var(--space-3);
+  font-size: 11px;
+  opacity: 0.55;
+}
+
+.music__player-note a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.music__platform-soon {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.35;
+}
+
+.music__platform-soon em {
+  font-style: normal;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+}
+
 /* Base row */
 .music__base {
   display: grid;

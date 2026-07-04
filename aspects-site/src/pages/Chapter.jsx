@@ -5,8 +5,16 @@ import MediaFrame from '../components/MediaFrame';
 import CoverArt from '../components/CoverArt';
 import EmailCapture from '../components/EmailCapture';
 import Reveal from '../components/Reveal';
-import PrismMark from '../components/PrismMark';
+import PrismGlass from '../components/PrismGlass';
 import './chapter.css';
+
+// Beam colour each chapter's prism emits across the hero (Love-draft scale).
+const EMIT = {
+  ego: 'rgba(217, 169, 74, 0.6)',
+  love: 'rgba(111, 151, 189, 0.55)',
+  reason: 'rgba(196, 54, 46, 0.5)',
+  art: 'rgba(138, 95, 196, 0.55)',
+};
 
 const SCENES = {
   ego: 'ego-mirror',
@@ -18,7 +26,9 @@ const SCENES = {
 // Ego and Love live on light paper; Reason and Art live in the dark.
 const DARK_CHAPTERS = ['reason', 'art'];
 
-const PLATFORMS = ['Spotify', 'Apple Music', 'Bandcamp', 'YouTube'];
+// Music lives on Bandcamp first; wider streaming lands later.
+// Replace-note: point at the real Bandcamp release URL per chapter.
+const BANDCAMP_URL = 'https://bandcamp.com';
 
 export default function Chapter({ chapter }) {
   const next = nextChapter(chapter.slug);
@@ -31,11 +41,11 @@ export default function Chapter({ chapter }) {
       className={`chapter ${dark ? 'chapter--dark' : 'chapter--light'} chapter--${chapter.id}`}
       data-theme={chapter.id}
     >
-      {/* HERO */}
+      {/* HERO — large prism on the left edge floods the page with the
+          chapter's light, as in the approved Love draft */}
       <header className="chapter__hero">
-        <div className="chapter__beam" aria-hidden="true" />
-        <div className="chapter__prism-accent" aria-hidden="true">
-          <PrismMark size={56} tint="currentColor" />
+        <div className="chapter__prism" aria-hidden="true">
+          <PrismGlass variant="emit" tint={EMIT[chapter.id]} />
         </div>
 
         <div className="container chapter__hero-grid">
@@ -85,23 +95,21 @@ export default function Chapter({ chapter }) {
                 Coming soon
               </button>
             ) : (
-              <button className="btn btn-accent chapter__listen-btn">
+              <a
+                href={BANDCAMP_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="btn btn-accent chapter__listen-btn"
+              >
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true">
                   <path d="M8 5v14l11-7z" />
                 </svg>
-                Listen to chapter
-              </button>
+                Listen on Bandcamp
+              </a>
             )}
-            <ul className="chapter__platforms" aria-label="Streaming platforms">
-              {PLATFORMS.map((p) => (
-                <li key={p}>
-                  {/* Replace-note: point at real platform URLs on release */}
-                  <a href={`https://open.spotify.com/`} target="_blank" rel="noreferrer" aria-disabled={locked}>
-                    {p}
-                  </a>
-                </li>
-              ))}
-            </ul>
+            <p className="chapter__streaming-note">
+              Spotify &middot; Apple Music &middot; YouTube &mdash; streaming soon
+            </p>
           </div>
         </Reveal>
 
