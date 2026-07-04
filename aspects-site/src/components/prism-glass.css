@@ -1,0 +1,98 @@
+.prism-glass {
+  position: relative;
+  width: 100%;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.12));
+}
+
+.prism-glass__svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.prism-glass__flare {
+  position: absolute;
+  left: 4%;
+  bottom: 4%;
+  width: 46%;
+  height: 10%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 60, 60, 0.55),
+    rgba(255, 200, 60, 0.5) 25%,
+    rgba(80, 220, 140, 0.45) 50%,
+    rgba(60, 130, 255, 0.5) 75%,
+    rgba(190, 90, 255, 0.5)
+  );
+  filter: blur(10px);
+  border-radius: 50%;
+  opacity: 0.8;
+  animation: flare-pulse 5s ease-in-out infinite;
+}
+
+@keyframes flare-pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+.prism-glass__beams {
+  position: absolute;
+  top: 46%;
+  left: 48%;
+  width: 130%;
+  height: 40%;
+  pointer-events: none;
+}
+
+.beam {
+  position: absolute;
+  left: 0;
+  height: 4px;
+  width: 100%;
+  border-radius: 2px;
+  transform-origin: left center;
+  opacity: 0.9;
+}
+
+.beam--white {
+  top: 50%;
+  left: -70%;
+  width: 70%;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), #ffffff);
+  height: 3px;
+}
+
+.beam--gold {
+  top: 30%;
+  background: linear-gradient(90deg, #f3cf7a, rgba(243, 207, 122, 0));
+  transform: rotate(-6deg);
+}
+
+.beam--blue {
+  top: 46%;
+  background: linear-gradient(90deg, #5c8fd6, rgba(92, 143, 214, 0));
+  transform: rotate(-1deg);
+}
+
+.beam--red {
+  top: 38%;
+  background: linear-gradient(90deg, #d65c53, rgba(214, 92, 83, 0));
+  transform: rotate(-3.5deg);
+}
+
+.beam--purple {
+  top: 58%;
+  background: linear-gradient(90deg, #a06fd1, rgba(160, 111, 209, 0));
+  transform: rotate(3deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prism-glass__flare {
+    animation: none;
+  }
+}

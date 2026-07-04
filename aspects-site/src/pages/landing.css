@@ -1,0 +1,159 @@
+.landing__hero {
+  position: relative;
+  min-height: calc(100svh - 72px);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.landing__hero-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  align-items: center;
+  gap: var(--space-5);
+  width: 100%;
+}
+
+.landing__title-wrap {
+  min-width: 0;
+}
+
+.landing__title {
+  display: flex;
+  align-items: flex-end;
+  line-height: 0.8;
+  margin-left: -0.5%;
+}
+
+.landing__prism-a {
+  display: block;
+  width: clamp(64px, 11vw, 168px);
+  flex: none;
+  margin-right: -1.5%;
+  transform: translateY(4%);
+}
+
+/*
+  Textured display type: the letterforms carry a moody B&W-city gradient
+  texture via background-clip, echoing the London-street photography in
+  the approved landing design.
+  Replace-note: to use real footage inside the letters later, place a video
+  at /public/media/videos/landing-letters-loop.mp4 and switch this to an
+  SVG text mask over a <video>.
+*/
+.landing__title-text {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(64px, 14.5vw, 218px);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  background:
+    radial-gradient(ellipse 30% 60% at 18% 40%, rgba(160, 42, 36, 0.75), transparent 65%),
+    radial-gradient(ellipse 25% 50% at 55% 30%, rgba(120, 130, 145, 0.9), transparent 70%),
+    radial-gradient(ellipse 35% 45% at 80% 65%, rgba(70, 76, 86, 0.95), transparent 72%),
+    linear-gradient(175deg, #4a4e55 0%, #22252a 45%, #0d0e11 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.landing__tagline {
+  margin-top: var(--space-4);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(16px, 2vw, 22px);
+  color: var(--grey-500);
+}
+
+/* Portrait placeholder: B&W studio figure emerging from off-white */
+.landing__portrait {
+  position: relative;
+  align-self: stretch;
+  min-height: 480px;
+  display: flex;
+}
+
+.landing__scroll-cue {
+  position: absolute;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.landing__scroll-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--grey-500);
+}
+
+.landing__scroll-line {
+  width: 1px;
+  height: 44px;
+  background: var(--ink);
+  animation: scroll-hint 2.2s var(--ease) infinite;
+  transform-origin: top;
+}
+
+@keyframes scroll-hint {
+  0% {
+    transform: scaleY(0);
+  }
+  55% {
+    transform: scaleY(1);
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 0;
+  }
+}
+
+.landing__closing {
+  text-align: center;
+}
+
+.landing__closing-line {
+  font-family: var(--font-serif);
+  font-size: clamp(26px, 4.4vw, 52px);
+  font-style: italic;
+  max-width: 18ch;
+  margin: 0 auto var(--space-5);
+  line-height: 1.25;
+}
+
+.landing__closing-links {
+  display: flex;
+  gap: var(--space-6);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 880px) {
+  .landing__hero {
+    min-height: auto;
+    padding: var(--space-6) 0 var(--space-7);
+  }
+  .landing__hero-grid {
+    grid-template-columns: 1fr;
+  }
+  .landing__portrait {
+    min-height: 340px;
+    max-width: 420px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .landing__scroll-cue {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing__scroll-line {
+    animation: none;
+  }
+}

@@ -1,0 +1,35 @@
+.prism-page__intro {
+  padding-bottom: 0;
+  text-align: center;
+}
+
+.prism-page__title {
+  font-size: clamp(38px, 7vw, 88px);
+  margin: var(--space-3) 0 var(--space-4);
+}
+
+.prism-page__lede {
+  max-width: 52ch;
+  margin: 0 auto;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--grey-500);
+}
+
+.prism-page__lede em {
+  font-family: var(--font-serif);
+  color: var(--ink);
+}
+
+.prism-page__outro {
+  text-align: center;
+}
+
+.prism-page__outro-line {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(18px, 2.4vw, 26px);
+  max-width: 40ch;
+  margin: 0 auto var(--space-4);
+  line-height: 1.5;
+}
