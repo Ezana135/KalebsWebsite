@@ -1,0 +1,40 @@
+.prism-page__intro {
+  padding-bottom: 0;
+  text-align: center;
+}
+
+.prism-page__title {
+  font-size: clamp(40px, 7.2vw, 92px);
+  margin: clamp(12px, 1.5vw, var(--space-3)) 0 clamp(20px, 2.5vw, var(--space-4));
+  line-height: 0.9;
+  letter-spacing: 0.02em;
+}
+
+.prism-page__lede {
+  max-width: 50ch;
+  margin: 0 auto;
+  font-size: 15px;
+  line-height: var(--leading-body);
+  color: var(--grey-500);
+}
+
+.prism-page__lede em {
+  font-family: var(--font-serif);
+  color: var(--ink);
+  font-style: italic;
+}
+
+.prism-page__outro {
+  text-align: center;
+  padding-bottom: var(--space-6);
+}
+
+.prism-page__outro-line {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(20px, 2.6vw, 28px);
+  max-width: 38ch;
+  margin: 0 auto clamp(20px, 2.5vw, var(--space-4));
+  line-height: 1.42;
+  letter-spacing: 0.01em;
+}

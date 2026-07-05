@@ -1,0 +1,232 @@
+.film {
+  position: relative;
+  background:
+    radial-gradient(ellipse 40% 50% at 0% 40%, rgba(201, 150, 44, 0.14), transparent 65%),
+    #0a0a0b;
+  color: var(--off-white);
+  padding-top: var(--space-6);
+  overflow: hidden;
+}
+
+.film__prism {
+  position: absolute;
+  left: -60px;
+  top: 22%;
+  width: 220px;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.film__hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: var(--space-6);
+  align-items: center;
+}
+
+.film__eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  opacity: 0.8;
+  margin-bottom: var(--space-3);
+}
+
+.film__eyebrow span {
+  color: var(--ego-accent);
+}
+
+.film__title {
+  font-size: clamp(76px, 11.5vw, 164px);
+  font-weight: 700;
+  line-height: 0.84;
+  letter-spacing: 0.02em;
+  background: linear-gradient(172deg, #f4f2ee 0%, #c8c4bc 55%, #8a867e 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.film__strap {
+  margin-top: var(--space-3);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.film__lede {
+  margin-top: var(--space-4);
+  font-size: 14px;
+  line-height: 1.8;
+  opacity: 0.8;
+  max-width: 38ch;
+}
+
+.film__lede strong {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+}
+
+.film__ctas {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-top: var(--space-5);
+}
+
+.film__ctas .btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.film__follow {
+  margin-top: var(--space-3);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  opacity: 0.5;
+}
+
+.film__chapters-section {
+  margin-top: var(--space-7);
+}
+
+.film__chapters-label {
+  color: var(--off-white);
+  opacity: 0.7;
+  margin-bottom: var(--space-4);
+}
+
+.film__cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-3);
+}
+
+.film__card {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line-dark);
+  padding: var(--space-3);
+  height: 100%;
+  background: rgba(255, 255, 255, 0.02);
+  transition: transform 0.35s var(--ease), border-color 0.35s;
+}
+
+.film__card:hover {
+  transform: translateY(-6px);
+}
+
+.film__card--ego:hover {
+  border-color: var(--ego-accent);
+}
+.film__card--love:hover {
+  border-color: var(--love-accent-soft);
+}
+.film__card--reason:hover {
+  border-color: var(--reason-accent);
+}
+.film__card--art:hover {
+  border-color: var(--art-accent);
+}
+
+.film__card .mframe {
+  border-radius: var(--radius-sm);
+}
+
+.film__card .mframe__play {
+  width: 44px;
+  height: 44px;
+}
+
+.film__card-soon {
+  aspect-ratio: 3 / 2.6;
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--line-dark);
+  display: grid;
+  place-items: center;
+  opacity: 0.55;
+}
+
+.film__card-num {
+  margin-top: var(--space-3);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+}
+
+.film__card--ego .film__card-num {
+  color: var(--ego-accent);
+}
+.film__card--love .film__card-num {
+  color: var(--love-accent-soft);
+}
+.film__card--reason .film__card-num {
+  color: var(--reason-accent);
+}
+.film__card--art .film__card-num {
+  color: var(--art-lavender);
+}
+.film__card--soon .film__card-num {
+  color: var(--grey-300);
+}
+
+.film__card-title {
+  font-size: clamp(18px, 1.8vw, 26px);
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.film__card-dek {
+  margin-top: 6px;
+  font-size: 11px;
+  line-height: 1.6;
+  opacity: 0.65;
+}
+
+.film__base {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-4);
+  align-items: center;
+  padding-bottom: var(--space-6);
+}
+
+.film__base .ecap {
+  margin-bottom: 0;
+}
+
+.film__watch-links {
+  display: flex;
+  gap: var(--space-3);
+}
+
+@media (max-width: 1024px) {
+  .film__cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 880px) {
+  .film__hero {
+    grid-template-columns: 1fr;
+  }
+  .film__base {
+    grid-template-columns: 1fr;
+  }
+  .film__prism {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .film__cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

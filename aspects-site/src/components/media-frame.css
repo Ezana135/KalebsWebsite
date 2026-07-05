@@ -1,0 +1,218 @@
+.mframe {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: #101014;
+  isolation: isolate;
+  box-shadow: var(--shadow-soft);
+}
+
+.mframe__scene {
+  position: absolute;
+  inset: 0;
+}
+
+.mframe__layer {
+  position: absolute;
+  inset: 0;
+}
+
+.mframe__grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.08'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+/* ---- EGO: mirrored hallway, near-black with gold rim light ---- */
+.mframe--ego-mirror .l1 {
+  background: linear-gradient(105deg, #0a0d13 0%, #131a26 34%, #0a0d13 35%, #1a2231 64%, #0a0d13 65%, #10161f 100%);
+}
+.mframe--ego-mirror .l2 {
+  background:
+    radial-gradient(ellipse 30% 65% at 68% 45%, rgba(201, 150, 44, 0.28), transparent 70%),
+    radial-gradient(ellipse 18% 50% at 30% 55%, rgba(120, 140, 170, 0.18), transparent 70%);
+}
+.mframe--ego-mirror .l3 {
+  background: repeating-linear-gradient(
+    95deg,
+    transparent 0 120px,
+    rgba(255, 255, 255, 0.05) 120px 122px
+  );
+}
+
+/* ---- LOVE: lake, mountains, dusk-blue film still ---- */
+.mframe--love-lake .l1 {
+  background: linear-gradient(180deg, #7d9cb8 0%, #4a6d8f 38%, #22415d 62%, #12283c 100%);
+}
+.mframe--love-lake .l2 {
+  background:
+    radial-gradient(ellipse 120% 45% at 50% 108%, rgba(10, 22, 34, 0.9), transparent 62%),
+    radial-gradient(ellipse 55% 30% at 72% 30%, rgba(236, 227, 210, 0.32), transparent 70%);
+}
+.mframe--love-lake .l3 {
+  background:
+    linear-gradient(180deg, transparent 55%, rgba(14, 30, 46, 0.35) 56%, transparent 58%),
+    radial-gradient(ellipse 26% 55% at 38% 78%, rgba(8, 16, 24, 0.85), transparent 74%),
+    radial-gradient(ellipse 20% 45% at 52% 80%, rgba(8, 16, 24, 0.8), transparent 74%);
+}
+
+/* ---- REASON: archival stage, red/gold wash, documentary ---- */
+.mframe--reason-archive .l1 {
+  background: linear-gradient(160deg, #1c1208 0%, #3a2410 42%, #14100a 100%);
+}
+.mframe--reason-archive .l2 {
+  background:
+    radial-gradient(ellipse 60% 70% at 62% 38%, rgba(217, 162, 51, 0.4), transparent 68%),
+    radial-gradient(ellipse 40% 55% at 40% 70%, rgba(196, 54, 46, 0.35), transparent 70%);
+}
+.mframe--reason-archive .l3 {
+  background:
+    radial-gradient(ellipse 22% 48% at 58% 58%, rgba(6, 4, 2, 0.85), transparent 72%),
+    repeating-linear-gradient(0deg, transparent 0 3px, rgba(0, 0, 0, 0.12) 3px 4px);
+}
+
+/* ---- ART: violet painterly motion collage ---- */
+.mframe--art-collage .l1 {
+  background: linear-gradient(120deg, #241536 0%, #4a2d72 36%, #2c1a4a 62%, #170e28 100%);
+}
+.mframe--art-collage .l2 {
+  background:
+    radial-gradient(ellipse 45% 65% at 40% 42%, rgba(203, 185, 232, 0.35), transparent 68%),
+    radial-gradient(ellipse 35% 55% at 74% 55%, rgba(232, 185, 138, 0.28), transparent 70%),
+    radial-gradient(ellipse 30% 45% at 58% 75%, rgba(90, 33, 64, 0.55), transparent 72%);
+}
+.mframe--art-collage .l3 {
+  background: repeating-linear-gradient(
+    75deg,
+    transparent 0 60px,
+    rgba(255, 255, 255, 0.04) 60px 61px,
+    transparent 61px 90px
+  );
+}
+
+/* ---- LONDON STREET: B&W city motion (landing letters / film trailer) ---- */
+.mframe--london-street .l1 {
+  background: linear-gradient(180deg, #3a3d42 0%, #23262b 45%, #101215 100%);
+}
+.mframe--london-street .l2 {
+  background:
+    radial-gradient(ellipse 30% 70% at 24% 40%, rgba(210, 214, 220, 0.3), transparent 70%),
+    radial-gradient(ellipse 50% 35% at 70% 52%, rgba(150, 40, 34, 0.5), transparent 68%),
+    radial-gradient(ellipse 60% 30% at 55% 92%, rgba(230, 232, 236, 0.16), transparent 70%);
+}
+.mframe--london-street .l3 {
+  background:
+    linear-gradient(90deg, transparent 46%, rgba(230, 232, 236, 0.1) 50%, transparent 55%),
+    radial-gradient(ellipse 16% 50% at 50% 55%, rgba(4, 5, 6, 0.9), transparent 75%);
+}
+
+/* ---- PORTRAIT: black-and-white studio portrait space ---- */
+.mframe--portrait .l1 {
+  background: radial-gradient(ellipse 90% 80% at 50% 30%, #e8e6e1 0%, #d4d1cb 55%, #bdbab3 100%);
+}
+.mframe--portrait .l2 {
+  background:
+    radial-gradient(ellipse 42% 34% at 50% 26%, #2a2a2c 0%, #2a2a2c 58%, transparent 62%),
+    radial-gradient(ellipse 60% 55% at 50% 88%, #131315 0%, #131315 55%, transparent 63%);
+}
+.mframe--portrait .l3 {
+  background: radial-gradient(ellipse 20% 14% at 50% 24%, rgba(240, 238, 234, 0.28), transparent 70%);
+}
+
+/* ---- DOC TRAILER: dark cinema, single figure back-turned ---- */
+.mframe--doc-trailer .l1 {
+  background: linear-gradient(180deg, #22252b 0%, #15171b 55%, #0a0b0d 100%);
+}
+.mframe--doc-trailer .l2 {
+  background:
+    radial-gradient(ellipse 40% 60% at 48% 45%, rgba(180, 186, 196, 0.22), transparent 68%),
+    radial-gradient(ellipse 45% 30% at 74% 55%, rgba(150, 44, 36, 0.42), transparent 66%);
+}
+.mframe--doc-trailer .l3 {
+  background: radial-gradient(ellipse 14% 46% at 50% 60%, rgba(3, 4, 5, 0.95), transparent 72%);
+}
+
+/* ---- JOURNAL FEATURE: dusk terrace, figure at balustrade ---- */
+.mframe--journal-feature .l1 {
+  background: linear-gradient(180deg, #4b4f56 0%, #2b2e34 50%, #17181c 100%);
+}
+.mframe--journal-feature .l2 {
+  background:
+    radial-gradient(ellipse 60% 40% at 60% 30%, rgba(190, 196, 205, 0.2), transparent 70%),
+    radial-gradient(ellipse 18% 55% at 62% 60%, rgba(5, 6, 8, 0.92), transparent 74%);
+}
+.mframe--journal-feature .l3 {
+  background: linear-gradient(90deg, rgba(10, 10, 12, 0.65) 0%, transparent 45%);
+}
+
+/* Controls */
+.mframe__play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(10, 10, 12, 0.42);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  backdrop-filter: blur(8px) saturate(1.2);
+  transition: transform 0.35s var(--ease), background 0.35s, border-color 0.35s;
+  z-index: 2;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+.mframe__play:hover {
+  transform: translate(-50%, -50%) scale(1.06);
+  background: rgba(10, 10, 12, 0.65);
+  border-color: rgba(255, 255, 255, 0.55);
+}
+
+.mframe__meta {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background: linear-gradient(180deg, transparent, rgba(5, 5, 6, 0.75));
+  color: #f2f0ec;
+  z-index: 2;
+}
+
+.mframe__caption {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent, #f2f0ec);
+}
+
+.mframe__time {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  opacity: 0.8;
+}
+
+.mframe__playing-note {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(5, 5, 6, 0.7);
+  color: #f2f0ec;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  z-index: 3;
+  white-space: nowrap;
+}
