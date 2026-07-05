@@ -17,17 +17,45 @@ import './prism-glass.css';
  * variant:
  *  'plain'  — just the glass form
  *  'flare'  — + small rainbow ground flare (landing A, contact)
- *  'beams'  — + white light in / four chapter beams out (refraction stage)
- *  'emit'   — + one broad beam of `tint` light flooding right (chapter heroes)
+ *  'beams'  — + white light in / four spectrum beams out (refraction stage)
+ *  'emit'   — + incoming light from left, chapter tint flooding out
+ *
+ * emitAngle:
+ *  'right'  — beam floods horizontally right (ego, love, art)
+ *  'down'   — beam angles down-right across the page (reason draft)
+ *
+ * animated — beams draw in with a subtle shimmer (static pages like /prism)
  */
-export default function PrismGlass({ variant = 'plain', tint, className = '' }) {
-  // unique gradient ids so multiple prisms can coexist on a page
+export default function PrismGlass({
+  variant = 'plain',
+  tint,
+  emitAngle = 'right',
+  animated = false,
+  className = '',
+}) {
   const id = useId().replace(/:/g, '');
 
   return (
-    <div className={`prism-glass prism-glass--${variant} ${className}`} aria-hidden="true">
+    <div
+      className={[
+        'prism-glass',
+        `prism-glass--${variant}`,
+        emitAngle === 'down' ? 'prism-glass--emit-down' : '',
+        animated ? 'prism-glass--animated' : '',
+        className,
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      aria-hidden="true"
+    >
       {variant === 'emit' && (
-        <span className="prism-glass__emit" style={{ '--emit': tint || 'rgba(255,255,255,0.5)' }} />
+        <>
+          <span className="prism-glass__incoming" />
+          <span
+            className="prism-glass__emit"
+            style={{ '--emit': tint || 'rgba(255,255,255,0.5)' }}
+          />
+        </>
       )}
 
       <svg viewBox="0 0 360 420" className="prism-glass__svg">
@@ -59,25 +87,17 @@ export default function PrismGlass({ variant = 'plain', tint, className = '' }) 
           </radialGradient>
         </defs>
 
-        {/* ground shadow */}
         <ellipse cx="182" cy="392" rx="150" ry="16" fill="#0b0b0c" opacity="0.10" />
 
-        {/* right facet (darker glass) */}
         <path d="M180 16 L308 384 L180 384 Z" fill={`url(#${id}-right)`} />
-        {/* left facet (bright glass) */}
         <path d="M180 16 L180 384 L52 384 Z" fill={`url(#${id}-left)`} />
-        {/* visible base face of the tetrahedron (the "A" counter) */}
         <path d="M92 384 L268 384 L180 306 Z" fill={`url(#${id}-base)`} />
 
-        {/* caustic rainbow pooling inside the base */}
         <ellipse cx="168" cy="368" rx="72" ry="26" fill={`url(#${id}-caustic)`} opacity="0.85" />
 
-        {/* internal edge: apex to base-face vertex */}
         <path d="M180 16 L180 306" stroke="#3a3d44" strokeWidth="1.4" opacity="0.5" />
-        {/* base-face inner edges */}
         <path d="M92 384 L180 306 L268 384" fill="none" stroke="#2b2d33" strokeWidth="2" opacity="0.55" />
 
-        {/* outer black edges shaping the A */}
         <path
           d="M180 16 L308 384 L52 384 Z"
           fill="none"
@@ -85,20 +105,19 @@ export default function PrismGlass({ variant = 'plain', tint, className = '' }) 
           strokeWidth="5"
           strokeLinejoin="round"
         />
-        {/* bright specular streak along the left edge (light entry side) */}
         <path d="M180 22 L60 380" stroke="#ffffff" strokeWidth="2.4" opacity="0.85" />
         <path d="M180 22 L60 380" stroke="#ffffff" strokeWidth="7" opacity="0.18" />
-        {/* subtle top sparkle */}
         <circle cx="180" cy="18" r="5" fill="#fff" opacity="0.9" />
       </svg>
 
       {variant === 'beams' && (
         <div className="prism-glass__beams" role="img" aria-label="White light refracting into four coloured beams">
           <span className="beam beam--white" />
-          <span className="beam beam--gold" />
+          {/* Spectrum order per Drafts/image.png: yellow, red, blue, green */}
+          <span className="beam beam--yellow" />
           <span className="beam beam--red" />
           <span className="beam beam--blue" />
-          <span className="beam beam--purple" />
+          <span className="beam beam--green" />
         </div>
       )}
 

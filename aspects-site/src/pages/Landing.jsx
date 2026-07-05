@@ -63,7 +63,7 @@ export default function Landing() {
             ASPECTS
           </span>
           <div className="landing__stage-prism">
-            <PrismGlass variant="beams" />
+            <PrismGlass variant="beams" className="landing__stage-beams" />
           </div>
           <p className="landing__thesis">Nothing real is ever just one thing.</p>
         </div>

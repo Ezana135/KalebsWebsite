@@ -167,26 +167,15 @@
 /* The A travels from its hero position (upper left, small) to centre stage */
 .landing__stage-prism {
   width: min(52vh, 82vw);
+  --beam-scale: clamp(0.001, calc((var(--p) - 0.38) * 4.5), 1);
+  --beam-white-opacity: clamp(0, calc((var(--p) - 0.3) * 7), 1);
+  --beam-color-opacity: clamp(0, calc((var(--p) - 0.38) * 5.5), 0.9);
   transform: translate(
       calc((1 - min(var(--p) * 1.6, 1)) * -34vw),
       calc((1 - min(var(--p) * 1.6, 1)) * -8vh)
     )
     scale(calc(0.22 + min(var(--p) * 1.6, 1) * 0.78));
   will-change: transform;
-}
-
-/* beams draw in as the prism settles (p ≈ 0.62+) */
-.landing__stage-prism .beam--white {
-  opacity: clamp(0, calc((var(--p) - 0.55) * 6), 1);
-}
-
-.landing__stage-prism .beam--gold,
-.landing__stage-prism .beam--red,
-.landing__stage-prism .beam--blue,
-.landing__stage-prism .beam--purple {
-  scale: clamp(0.001, calc((var(--p) - 0.62) * 4), 1) 1;
-  transform-origin: left center;
-  opacity: clamp(0, calc((var(--p) - 0.6) * 5), 0.9);
 }
 
 /* thesis lands only after the prism has been seen in full */

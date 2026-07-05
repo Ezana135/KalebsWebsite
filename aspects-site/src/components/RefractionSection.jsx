@@ -25,7 +25,7 @@ export default function RefractionSection({ id = 'refraction' }) {
 
         <Reveal delay={120}>
           <div className="refraction__stage">
-            <PrismGlass variant="beams" />
+            <PrismGlass variant="beams" animated />
           </div>
         </Reveal>
 

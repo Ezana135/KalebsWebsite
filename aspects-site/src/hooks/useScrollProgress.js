@@ -33,9 +33,13 @@ export default function useScrollProgress(varName = '--p') {
     update();
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
+    // Catch layout shifts and anchor jumps that don't always fire scroll.
+    const ro = new ResizeObserver(onScroll);
+    ro.observe(el);
     return () => {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
+      ro.disconnect();
       if (raf) cancelAnimationFrame(raf);
     };
   }, [varName]);
