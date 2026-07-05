@@ -39,10 +39,11 @@
 }
 
 .film__title {
-  font-size: clamp(72px, 11vw, 160px);
+  font-size: clamp(76px, 11.5vw, 164px);
   font-weight: 700;
-  line-height: 0.86;
-  background: linear-gradient(175deg, #f2f0ec 0%, #b9b5ad 70%, #8a867e 100%);
+  line-height: 0.84;
+  letter-spacing: 0.02em;
+  background: linear-gradient(172deg, #f4f2ee 0%, #c8c4bc 55%, #8a867e 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;

@@ -2,14 +2,14 @@
   position: sticky;
   top: 0;
   z-index: 50;
-  background: color-mix(in srgb, var(--off-white) 88%, transparent);
-  backdrop-filter: blur(10px);
+  background: color-mix(in srgb, var(--off-white) 90%, transparent);
+  backdrop-filter: blur(14px) saturate(1.2);
   border-bottom: 1px solid transparent;
-  transition: border-color 0.3s var(--ease);
+  transition: border-color 0.35s var(--ease), background 0.35s var(--ease);
 }
 
 .nav--dark {
-  background: color-mix(in srgb, #0b0b0c 82%, transparent);
+  background: color-mix(in srgb, #0b0b0c 86%, transparent);
   color: var(--off-white);
 }
 
@@ -23,24 +23,29 @@
 .nav__brand {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
-  font-size: 13px;
+  gap: 11px;
+  font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.28em;
+  letter-spacing: 0.3em;
+  transition: opacity 0.25s;
+}
+
+.nav__brand:hover {
+  opacity: 0.75;
 }
 
 .nav__links {
   display: flex;
-  gap: var(--space-5);
+  gap: clamp(28px, 3.5vw, var(--space-5));
 }
 
 .nav__link {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
-  opacity: 0.75;
-  transition: opacity 0.25s;
+  opacity: 0.68;
+  transition: opacity 0.3s var(--ease), border-color 0.3s;
   padding: 6px 0;
   border-bottom: 1px solid transparent;
 }
@@ -65,6 +70,7 @@
   width: 22px;
   height: 1.5px;
   background: currentColor;
+  transition: transform 0.3s var(--ease);
 }
 
 .nav__drawer {
@@ -95,6 +101,7 @@
   font-size: clamp(32px, 8vw, 56px);
   text-transform: uppercase;
   letter-spacing: 0.02em;
+  line-height: var(--leading-display);
 }
 
 @media (max-width: 880px) {

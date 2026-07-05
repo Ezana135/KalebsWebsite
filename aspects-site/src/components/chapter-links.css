@@ -4,53 +4,58 @@
   padding: 0;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-4);
+  gap: clamp(20px, 2.5vw, var(--space-4));
 }
 
 .chlinks__item {
   display: block;
-  padding: var(--space-4) 0;
+  padding: clamp(20px, 2.5vw, var(--space-4)) 0;
   border-top: 1px solid var(--line);
-  transition: transform 0.35s var(--ease);
+  transition: transform 0.4s var(--ease);
 }
 
 .chlinks__item:hover {
-  transform: translateY(-4px);
+  transform: translateY(-5px);
 }
 
 .chlinks__num {
   display: block;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.22em;
   color: var(--chapter-colour);
-  margin-bottom: var(--space-2);
+  margin-bottom: clamp(10px, 1.2vw, var(--space-2));
+  opacity: 0.85;
 }
 
 .chlinks__title {
   display: block;
   font-family: var(--font-display);
-  font-size: clamp(26px, 3.4vw, 44px);
+  font-size: clamp(28px, 3.6vw, 46px);
   font-weight: 700;
   text-transform: uppercase;
+  line-height: 0.92;
+  letter-spacing: 0.02em;
 }
 
 .chlinks__sub {
   display: block;
-  margin-top: var(--space-2);
+  margin-top: clamp(10px, 1.2vw, var(--space-2));
   font-family: var(--font-serif);
   font-style: italic;
-  font-size: 13px;
+  font-size: 12px;
+  line-height: var(--leading-serif);
   color: var(--grey-500);
 }
 
 .chlinks__line {
   display: block;
-  margin-top: var(--space-3);
-  height: 3px;
-  width: 44px;
+  margin-top: clamp(14px, 1.8vw, var(--space-3));
+  height: 2px;
+  width: 40px;
   background: var(--chapter-colour);
-  transition: width 0.35s var(--ease);
+  transition: width 0.4s var(--ease);
+  opacity: 0.85;
 }
 
 .chlinks__item:hover .chlinks__line,

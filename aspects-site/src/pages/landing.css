@@ -7,125 +7,173 @@
   overflow: hidden;
 }
 
+/* Soft prism-light wash connecting title to portrait column */
+.landing__hero::before {
+  content: '';
+  position: absolute;
+  right: 8%;
+  top: 18%;
+  width: 42%;
+  height: 68%;
+  background:
+    radial-gradient(ellipse 50% 40% at 20% 75%, rgba(233, 193, 78, 0.06), transparent 65%),
+    radial-gradient(ellipse 40% 35% at 35% 80%, rgba(92, 143, 214, 0.05), transparent 65%),
+    radial-gradient(ellipse 45% 50% at 60% 30%, rgba(255, 255, 255, 0.4), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
 .landing__hero-grid {
+  position: relative;
+  z-index: 1;
   display: grid;
-  /* generous gap so the S never touches the portrait */
-  grid-template-columns: 1.75fr 0.9fr;
+  grid-template-columns: 1.68fr 0.88fr;
   align-items: center;
-  gap: clamp(48px, 6vw, 110px);
+  gap: clamp(56px, 7vw, 120px);
   width: 100%;
 }
 
 .landing__title-wrap {
   min-width: 0;
+  padding-top: clamp(8px, 1.5vw, 24px);
 }
 
 .landing__title {
   display: flex;
   align-items: flex-end;
-  line-height: 0.8;
-  margin-left: -0.5%;
+  line-height: 0.78;
+  margin-left: -0.3%;
 }
 
 .landing__prism-a {
   display: block;
-  width: clamp(68px, 11.5vw, 172px);
+  width: clamp(72px, 11.8vw, 178px);
   flex: none;
-  margin-right: -1%;
-  transform: translateY(6%);
+  margin-right: -0.5%;
+  transform: translateY(8%);
+  filter: drop-shadow(0 8px 24px rgba(11, 11, 12, 0.12));
 }
 
-/*
-  Textured display type: the letterforms carry a moody B&W-city gradient
-  texture via background-clip, echoing the London-street photography in
-  the approved landing design.
-  Replace-note: to use real footage inside the letters later, place a video
-  at /public/media/videos/landing-letters-loop.mp4 and switch this to an
-  SVG text mask over a <video>.
-*/
 .landing__title-text {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: clamp(58px, 12.5vw, 196px);
-  letter-spacing: 0.01em;
+  font-size: clamp(62px, 12.8vw, 200px);
+  letter-spacing: 0.015em;
   text-transform: uppercase;
   background:
-    radial-gradient(ellipse 30% 60% at 18% 40%, rgba(160, 42, 36, 0.75), transparent 65%),
-    radial-gradient(ellipse 25% 50% at 55% 30%, rgba(120, 130, 145, 0.9), transparent 70%),
-    radial-gradient(ellipse 35% 45% at 80% 65%, rgba(70, 76, 86, 0.95), transparent 72%),
-    linear-gradient(175deg, #4a4e55 0%, #22252a 45%, #0d0e11 100%);
+    radial-gradient(ellipse 28% 58% at 16% 38%, rgba(160, 42, 36, 0.78), transparent 62%),
+    radial-gradient(ellipse 22% 48% at 52% 28%, rgba(120, 130, 145, 0.92), transparent 68%),
+    radial-gradient(ellipse 32% 42% at 82% 62%, rgba(70, 76, 86, 0.96), transparent 70%),
+    linear-gradient(172deg, #4a4e55 0%, #2a2d32 42%, #121316 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
 .landing__tagline {
-  margin-top: var(--space-4);
+  margin-top: clamp(20px, 2.8vw, 32px);
+  padding-left: clamp(0px, 0.5vw, 4px);
   font-family: var(--font-serif);
   font-style: italic;
-  font-size: clamp(16px, 2vw, 22px);
+  font-size: clamp(17px, 2.1vw, 24px);
+  line-height: var(--leading-serif);
+  letter-spacing: 0.01em;
   color: var(--grey-500);
+  max-width: 28ch;
 }
 
-/* Right column: smaller portrait + email capture directly beneath it */
+/* Right column: portrait + email — visually tethered to the prism A */
 .landing__side {
   display: grid;
-  gap: var(--space-3);
+  gap: clamp(16px, 2vw, 24px);
   justify-self: end;
   width: 100%;
-  max-width: 340px;
+  max-width: 328px;
+  padding-top: clamp(12px, 2vw, 28px);
 }
 
 .landing__portrait {
   position: relative;
   aspect-ratio: 3 / 4;
   display: flex;
+  box-shadow: var(--shadow-lift);
+}
+
+/* Subtle prism-colour rim on portrait — ties A to figure */
+.landing__portrait::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    inset -3px 0 24px rgba(92, 143, 214, 0.08),
+    inset 0 -2px 20px rgba(233, 193, 78, 0.06);
+  pointer-events: none;
+  z-index: 2;
 }
 
 .landing__side .ecap {
   margin: 0;
   grid-template-columns: 1fr;
   gap: var(--space-2);
+  padding: var(--space-3) 0 0;
+  border: none;
+  background: transparent;
 }
 
 .landing__side .ecap__heading {
-  font-size: 12px;
-  letter-spacing: 0.22em;
+  font-size: 10px;
+  letter-spacing: 0.26em;
+  color: var(--grey-500);
+}
+
+.landing__side .ecap__form input {
+  border-radius: 999px 0 0 999px;
+  padding: 13px 16px;
+  font-size: 13px;
+}
+
+.landing__side .ecap__btn {
+  padding: 13px 20px;
+  font-size: 10px;
 }
 
 .landing__scroll-cue {
   position: absolute;
   left: 50%;
-  bottom: 28px;
+  bottom: 32px;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  z-index: 2;
 }
 
 .landing__scroll-label {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.3em;
+  letter-spacing: 0.32em;
   text-transform: uppercase;
-  color: var(--grey-500);
+  color: var(--grey-400);
 }
 
 .landing__scroll-line {
   width: 1px;
-  height: 44px;
-  background: var(--ink);
-  animation: scroll-hint 2.2s var(--ease) infinite;
+  height: 48px;
+  background: linear-gradient(180deg, var(--ink), transparent);
+  animation: scroll-hint 2.4s var(--ease) infinite;
   transform-origin: top;
 }
 
 @keyframes scroll-hint {
   0% {
     transform: scaleY(0);
+    opacity: 1;
   }
   55% {
     transform: scaleY(1);
+    opacity: 1;
   }
   100% {
     transform: scaleY(1);
@@ -134,7 +182,6 @@
 }
 
 /* ================= PRISM SEQUENCE ================= */
-/* Tall wrapper; sticky stage. --p (0→1) is set by useScrollProgress. */
 .landing__seq {
   height: 320vh;
   --p: 0;
@@ -147,6 +194,22 @@
   overflow: hidden;
   display: grid;
   place-items: center;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 100%, rgba(11, 11, 12, 0.03), transparent 65%),
+    linear-gradient(180deg, var(--off-white) 0%, var(--paper) 100%);
+}
+
+/* Exhibition floor line */
+.landing__stage::after {
+  content: '';
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  bottom: 14%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(11, 11, 12, 0.08) 20%, rgba(11, 11, 12, 0.08) 80%, transparent);
+  opacity: clamp(0, calc((var(--p) - 0.4) * 3), 1);
+  pointer-events: none;
 }
 
 .landing__ghost {
@@ -155,58 +218,65 @@
   left: 50%;
   transform: translate(-50%, -50%);
   font-family: var(--font-serif);
-  font-size: clamp(90px, 18vw, 280px);
-  letter-spacing: 0.14em;
-  color: rgba(11, 11, 12, 0.05);
+  font-size: clamp(88px, 17.5vw, 272px);
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  color: rgba(11, 11, 12, 0.045);
   white-space: nowrap;
   pointer-events: none;
   user-select: none;
-  opacity: clamp(0, calc((var(--p) - 0.25) * 2.2), 1);
+  opacity: clamp(0, calc((var(--p) - 0.22) * 2.4), 1);
 }
 
-/* The A travels from its hero position (upper left, small) to centre stage */
 .landing__stage-prism {
-  width: min(52vh, 82vw);
+  width: min(54vh, 84vw);
   transform: translate(
       calc((1 - min(var(--p) * 1.6, 1)) * -34vw),
       calc((1 - min(var(--p) * 1.6, 1)) * -8vh)
     )
-    scale(calc(0.22 + min(var(--p) * 1.6, 1) * 0.78));
+    scale(calc(0.2 + min(var(--p) * 1.6, 1) * 0.8));
   will-change: transform;
 }
 
-/* beams draw in as the prism settles (p ≈ 0.62+) */
 .landing__stage-prism .beam--white {
-  opacity: clamp(0, calc((var(--p) - 0.55) * 6), 1);
+  opacity: clamp(0, calc((var(--p) - 0.52) * 5.5), 1);
 }
 
 .landing__stage-prism .beam--gold,
 .landing__stage-prism .beam--red,
 .landing__stage-prism .beam--blue,
 .landing__stage-prism .beam--purple {
-  scale: clamp(0.001, calc((var(--p) - 0.62) * 4), 1) 1;
+  scale: clamp(0.001, calc((var(--p) - 0.58) * 3.8), 1) 1;
   transform-origin: left center;
-  opacity: clamp(0, calc((var(--p) - 0.6) * 5), 0.9);
+  opacity: clamp(0, calc((var(--p) - 0.56) * 4.5), 0.92);
 }
 
-/* thesis lands only after the prism has been seen in full */
+.landing__stage-prism .prism-glass__caustics {
+  opacity: clamp(0, calc((var(--p) - 0.62) * 4), 0.7);
+}
+
 .landing__thesis {
   position: absolute;
-  bottom: 9%;
+  bottom: clamp(7%, 9vh, 11%);
   left: 50%;
-  transform: translate(-50%, calc((1 - clamp(0, calc((var(--p) - 0.82) * 6), 1)) * 20px));
-  opacity: clamp(0, calc((var(--p) - 0.82) * 6), 1);
+  transform: translate(-50%, calc((1 - clamp(0, calc((var(--p) - 0.8) * 5.5), 1)) * 24px));
+  opacity: clamp(0, calc((var(--p) - 0.8) * 5.5), 1);
   font-family: var(--font-serif);
   font-style: italic;
-  font-size: clamp(20px, 3vw, 36px);
+  font-weight: 400;
+  font-size: clamp(22px, 3.2vw, 38px);
+  line-height: 1.35;
+  letter-spacing: 0.01em;
   text-align: center;
   width: max-content;
   max-width: 90vw;
+  color: var(--ink-soft);
 }
 
 /* ================= CHAPTERS ================= */
 .landing__chapters {
-  padding-top: var(--space-5);
+  padding-top: var(--space-6);
+  padding-bottom: var(--space-5);
 }
 
 /* ================= EGO TAKEOVER ================= */
@@ -224,13 +294,12 @@
   align-items: center;
 }
 
-/* gold floods the page left → right as you keep scrolling */
 .landing__tk-wash {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 70% 60% at 20% 45%, rgba(231, 192, 122, 0.5), transparent 70%),
-    linear-gradient(100deg, #c9962c 0%, #b98a24 40%, #a87c1e 100%);
+    radial-gradient(ellipse 65% 55% at 18% 42%, rgba(231, 192, 122, 0.55), transparent 68%),
+    linear-gradient(100deg, #d4a83a 0%, #c9962c 35%, #b98a24 65%, #a87c1e 100%);
   transform: scaleX(min(calc(var(--t) * 1.45), 1));
   transform-origin: left center;
   will-change: transform;
@@ -240,23 +309,24 @@
   position: absolute;
   left: 4vw;
   top: 50%;
-  width: min(34vh, 40vw);
+  width: min(36vh, 42vw);
   transform: translateY(-50%);
   opacity: clamp(0, calc(var(--t) * 3), 1);
+  filter: drop-shadow(0 16px 40px rgba(16, 22, 31, 0.25));
 }
 
 .landing__tk-copy {
   position: relative;
   margin-left: clamp(30vw, 38vw, 44vw);
-  opacity: clamp(0, calc((var(--t) - 0.45) * 3.2), 1);
-  transform: translateX(calc((1 - clamp(0, calc((var(--t) - 0.45) * 3.2), 1)) * 40px));
+  opacity: clamp(0, calc((var(--t) - 0.42) * 3.2), 1);
+  transform: translateX(calc((1 - clamp(0, calc((var(--t) - 0.42) * 3.2), 1)) * 36px));
   color: #14161c;
 }
 
 .landing__tk-eyebrow {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.3em;
+  letter-spacing: 0.32em;
   text-transform: uppercase;
   margin-bottom: var(--space-3);
 }
@@ -267,40 +337,45 @@
 
 .landing__tk-title {
   font-family: var(--font-display);
-  font-size: clamp(80px, 14vw, 200px);
+  font-size: clamp(84px, 14.5vw, 208px);
   font-weight: 700;
-  line-height: 0.85;
+  line-height: 0.84;
+  letter-spacing: 0.01em;
   text-transform: uppercase;
   color: #10161f;
 }
 
 .landing__tk-sub {
-  margin-top: var(--space-3);
+  margin-top: clamp(16px, 2vw, 24px);
   font-family: var(--font-serif);
   font-style: italic;
-  font-size: clamp(15px, 1.8vw, 20px);
-  letter-spacing: 0.08em;
+  font-size: clamp(16px, 1.9vw, 21px);
+  letter-spacing: 0.06em;
+  line-height: var(--leading-serif);
 }
 
 .landing__tk-enter {
-  margin-top: var(--space-5);
+  margin-top: clamp(32px, 4vw, 48px);
   border-color: #10161f;
   color: #10161f;
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .landing__tk-enter:hover {
   background: #10161f;
   color: #e7c07a;
+  box-shadow: 0 12px 32px rgba(16, 22, 31, 0.2);
 }
 
 /* ================= CLOSING ================= */
 .landing__closing {
   text-align: center;
+  padding-bottom: var(--space-7);
 }
 
 .landing__closing-links {
   display: flex;
-  gap: var(--space-6);
+  gap: clamp(40px, 6vw, 72px);
   justify-content: center;
   flex-wrap: wrap;
 }
@@ -311,12 +386,17 @@
     min-height: auto;
     padding: var(--space-6) 0 var(--space-7);
   }
+  .landing__hero::before {
+    display: none;
+  }
   .landing__hero-grid {
     grid-template-columns: 1fr;
+    gap: var(--space-6);
   }
   .landing__side {
     justify-self: center;
-    max-width: 320px;
+    max-width: 300px;
+    padding-top: 0;
   }
   .landing__scroll-cue {
     display: none;

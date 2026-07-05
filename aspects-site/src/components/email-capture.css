@@ -1,17 +1,18 @@
 .ecap {
   display: grid;
-  grid-template-columns: 1.1fr 1.4fr auto;
+  grid-template-columns: 1.05fr 1.45fr auto;
   align-items: center;
-  gap: var(--space-4);
-  padding: var(--space-5) var(--space-5);
+  gap: clamp(20px, 2.5vw, var(--space-4));
+  padding: clamp(28px, 3.5vw, var(--space-5));
   border-radius: var(--radius-lg);
-  margin: var(--space-6) 0;
+  margin: clamp(48px, 6vw, var(--space-6)) 0;
 }
 
 .ecap--dark {
   background: var(--dark, #101014);
   color: var(--off-white);
   border: 1px solid var(--line-dark);
+  box-shadow: var(--shadow-soft);
 }
 
 .ecap--light {
@@ -23,20 +24,22 @@
 .ecap--sand {
   background: var(--love-sand);
   color: var(--ink);
+  border: 1px solid rgba(47, 92, 138, 0.08);
 }
 
 .ecap__heading {
   font-family: var(--font-display);
-  font-size: clamp(18px, 2.4vw, 26px);
+  font-size: clamp(17px, 2.2vw, 24px);
   text-transform: uppercase;
-  letter-spacing: 0.28em;
+  letter-spacing: 0.3em;
   font-weight: 600;
+  line-height: 1.2;
 }
 
 .ecap__body {
-  font-size: 14px;
-  line-height: 1.6;
-  opacity: 0.75;
+  font-size: 13px;
+  line-height: var(--leading-body);
+  opacity: 0.72;
 }
 
 .ecap__form {
@@ -49,23 +52,35 @@
   flex: 1;
   min-width: 0;
   padding: 14px 18px;
-  font-size: 14px;
+  font-size: 13px;
   font-family: inherit;
   border: 1px solid var(--line);
   border-radius: 999px 0 0 999px;
   background: rgba(255, 255, 255, 0.92);
   color: var(--ink);
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.ecap__form input:focus {
+  border-color: var(--ink);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(11, 11, 12, 0.06);
 }
 
 .ecap--dark .ecap__form input {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.07);
   border-color: var(--line-dark);
   color: var(--off-white);
 }
 
+.ecap--dark .ecap__form input:focus {
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06);
+}
+
 .ecap__form input::placeholder {
   color: inherit;
-  opacity: 0.5;
+  opacity: 0.45;
 }
 
 .ecap__btn {
@@ -74,11 +89,16 @@
   border-radius: 0 999px 999px 0;
   background: var(--accent, var(--ink));
   color: #0b0b0c;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   white-space: nowrap;
+  transition: opacity 0.25s, transform 0.25s;
+}
+
+.ecap__btn:hover {
+  opacity: 0.88;
 }
 
 .ecap--light .ecap__btn,
@@ -88,6 +108,7 @@
 }
 
 .ecap__done {
+  font-family: var(--font-serif);
   font-size: 14px;
   font-style: italic;
   opacity: 0.85;
@@ -96,15 +117,15 @@
 
 .ecap__note {
   grid-column: 1 / -1;
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  opacity: 0.5;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  opacity: 0.45;
 }
 
 .ecap--compact {
   grid-template-columns: auto 1fr;
-  padding: var(--space-3) var(--space-4);
-  margin: var(--space-4) 0;
+  padding: clamp(12px, 1.5vw, var(--space-3)) clamp(16px, 2vw, var(--space-4));
+  margin: clamp(16px, 2vw, var(--space-4)) 0;
 }
 
 @media (max-width: 880px) {

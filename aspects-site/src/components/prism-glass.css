@@ -1,7 +1,7 @@
 .prism-glass {
   position: relative;
   width: 100%;
-  filter: drop-shadow(0 18px 36px rgba(0, 0, 0, 0.14));
+  filter: drop-shadow(var(--shadow-prism));
 }
 
 .prism-glass__svg {
@@ -9,114 +9,211 @@
   width: 100%;
   height: auto;
   display: block;
-  z-index: 1;
+  z-index: 2;
+}
+
+/* Exhibition floor beneath the sculpture */
+.prism-glass__floor {
+  position: absolute;
+  left: -30%;
+  right: -30%;
+  bottom: 2%;
+  height: 14%;
+  background: radial-gradient(ellipse 55% 100% at 50% 0%, rgba(11, 11, 12, 0.06), transparent 72%);
+  z-index: 0;
+  pointer-events: none;
 }
 
 /* small rainbow ground flare (landing A, contact) */
 .prism-glass__flare {
   position: absolute;
-  left: 6%;
-  bottom: 5%;
-  width: 52%;
-  height: 9%;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 60, 60, 0.5),
-    rgba(255, 200, 60, 0.48) 25%,
-    rgba(80, 220, 140, 0.42) 50%,
-    rgba(60, 130, 255, 0.48) 75%,
-    rgba(190, 90, 255, 0.45)
-  );
-  filter: blur(9px);
+  left: 4%;
+  bottom: 4%;
+  width: 58%;
+  height: 11%;
+  background:
+    radial-gradient(ellipse 100% 100% at 15% 50%, rgba(255, 70, 70, 0.55), transparent 55%),
+    radial-gradient(ellipse 100% 100% at 38% 50%, rgba(255, 210, 70, 0.5), transparent 55%),
+    radial-gradient(ellipse 100% 100% at 58% 50%, rgba(70, 220, 140, 0.42), transparent 55%),
+    radial-gradient(ellipse 100% 100% at 78% 50%, rgba(60, 130, 255, 0.48), transparent 55%),
+    radial-gradient(ellipse 100% 100% at 95% 50%, rgba(190, 90, 255, 0.4), transparent 55%);
+  filter: blur(10px);
   border-radius: 50%;
-  opacity: 0.85;
-  animation: flare-pulse 5s ease-in-out infinite;
-  z-index: 0;
+  opacity: 0.82;
+  animation: flare-pulse 6s ease-in-out infinite;
+  z-index: 1;
+  mix-blend-mode: multiply;
 }
 
 @keyframes flare-pulse {
   0%,
   100% {
-    opacity: 0.65;
+    opacity: 0.58;
+    transform: scaleX(0.96);
   }
   50% {
-    opacity: 0.95;
+    opacity: 0.92;
+    transform: scaleX(1.02);
   }
 }
 
 /* broad single-colour beam flooding right (chapter heroes) */
 .prism-glass__emit {
   position: absolute;
-  left: 46%;
-  top: 30%;
+  left: 44%;
+  top: 28%;
   width: 3200%;
   max-width: 100vw;
-  height: 46%;
-  background: linear-gradient(94deg, var(--emit), transparent 82%);
-  clip-path: polygon(0 44%, 100% 0, 100% 100%, 0 56%);
-  filter: blur(3px);
-  opacity: 0.6;
+  height: 50%;
+  background:
+    radial-gradient(ellipse 8% 80% at 0% 50%, var(--emit), transparent 70%),
+    linear-gradient(94deg, var(--emit), transparent 78%);
+  clip-path: polygon(0 42%, 100% 0, 100% 100%, 0 58%);
+  filter: blur(4px);
+  opacity: 0.55;
   z-index: 0;
   pointer-events: none;
+  mix-blend-mode: multiply;
 }
 
-/* refraction beams (image.png geometry: white in from left at mid-height,
-   fan of colour out to the upper right) */
+/* refraction beams — projected light, not coloured rectangles */
 .prism-glass__beams {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 2;
+  z-index: 3;
+  overflow: visible;
 }
 
 .beam {
   position: absolute;
-  height: 1.6%;
-  border-radius: 3px;
   transform-origin: left center;
-  opacity: 0.9;
 }
 
+/* White entry beam */
 .beam--white {
-  top: 55.5%;
-  right: 76%;
-  width: 90%;
-  height: 1.2%;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0), #ffffff 70%);
-  box-shadow: 0 0 14px rgba(255, 255, 255, 0.9);
+  top: 54%;
+  right: 74%;
+  width: 88%;
+  height: 0;
 }
 
+.beam--white .beam__core {
+  position: absolute;
+  inset: -3px 0;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.35) 40%, #ffffff 85%);
+  clip-path: polygon(0 46%, 100% 42%, 100% 58%, 0 54%);
+  filter: blur(0.5px);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.85), 0 0 40px rgba(255, 255, 255, 0.35);
+}
+
+.beam--white .beam__bloom {
+  position: absolute;
+  right: -2%;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  transform: translateY(-50%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.4) 40%, transparent 70%);
+  filter: blur(2px);
+}
+
+/* Coloured exit beams — fan out upper-right */
 .beam--gold,
 .beam--red,
 .beam--blue,
 .beam--purple {
-  left: 51%;
-  top: 55%;
-  width: 130%;
+  left: 50%;
+  top: 53%;
+  width: 135%;
+  height: 0;
+}
+
+.beam__core {
+  position: absolute;
+  inset: -5px 0;
+  opacity: 0.88;
+  mix-blend-mode: multiply;
+}
+
+.beam__spill {
+  position: absolute;
+  inset: -14px -20px -14px 0;
+  opacity: 0.45;
+  filter: blur(8px);
+  mix-blend-mode: multiply;
 }
 
 .beam--gold {
-  background: linear-gradient(90deg, #e9c14e, rgba(233, 193, 78, 0));
-  transform: rotate(-7deg);
+  transform: rotate(-8deg);
+}
+.beam--gold .beam__core {
+  background: linear-gradient(90deg, rgba(233, 193, 78, 0.85) 0%, rgba(233, 193, 78, 0.35) 35%, transparent 100%);
+  clip-path: polygon(0 44%, 100% 38%, 100% 62%, 0 56%);
+}
+.beam--gold .beam__spill {
+  background: linear-gradient(90deg, rgba(233, 193, 78, 0.5), transparent 70%);
 }
 
 .beam--red {
-  background: linear-gradient(90deg, #d65c53, rgba(214, 92, 83, 0));
-  transform: rotate(-2.5deg);
+  transform: rotate(-3deg);
+}
+.beam--red .beam__core {
+  background: linear-gradient(90deg, rgba(214, 92, 83, 0.82) 0%, rgba(214, 92, 83, 0.32) 38%, transparent 100%);
+  clip-path: polygon(0 46%, 100% 42%, 100% 58%, 0 54%);
+}
+.beam--red .beam__spill {
+  background: linear-gradient(90deg, rgba(214, 92, 83, 0.45), transparent 72%);
 }
 
 .beam--blue {
-  background: linear-gradient(90deg, #5c8fd6, rgba(92, 143, 214, 0));
-  transform: rotate(2deg);
+  transform: rotate(2.5deg);
+}
+.beam--blue .beam__core {
+  background: linear-gradient(90deg, rgba(92, 143, 214, 0.82) 0%, rgba(92, 143, 214, 0.3) 40%, transparent 100%);
+  clip-path: polygon(0 48%, 100% 44%, 100% 56%, 0 52%);
+}
+.beam--blue .beam__spill {
+  background: linear-gradient(90deg, rgba(92, 143, 214, 0.42), transparent 74%);
 }
 
 .beam--purple {
-  background: linear-gradient(90deg, #a06fd1, rgba(160, 111, 209, 0));
-  transform: rotate(6.5deg);
+  transform: rotate(7deg);
+}
+.beam--purple .beam__core {
+  background: linear-gradient(90deg, rgba(160, 111, 209, 0.78) 0%, rgba(160, 111, 209, 0.28) 42%, transparent 100%);
+  clip-path: polygon(0 50%, 100% 46%, 100% 54%, 0 50%);
+}
+.beam--purple .beam__spill {
+  background: linear-gradient(90deg, rgba(160, 111, 209, 0.4), transparent 76%);
+}
+
+/* Caustic pool on the floor beneath exit beams */
+.prism-glass__caustics {
+  position: absolute;
+  left: 38%;
+  bottom: 6%;
+  width: 55%;
+  height: 8%;
+  background:
+    radial-gradient(ellipse 30% 100% at 12% 50%, rgba(233, 193, 78, 0.35), transparent 70%),
+    radial-gradient(ellipse 28% 100% at 32% 50%, rgba(214, 92, 83, 0.28), transparent 70%),
+    radial-gradient(ellipse 26% 100% at 52% 50%, rgba(92, 143, 214, 0.3), transparent 70%),
+    radial-gradient(ellipse 24% 100% at 72% 50%, rgba(160, 111, 209, 0.28), transparent 70%);
+  filter: blur(6px);
+  opacity: 0.7;
+  mix-blend-mode: multiply;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .prism-glass__flare {
     animation: none;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .beam__core,
+  .beam__spill {
+    mix-blend-mode: screen;
   }
 }

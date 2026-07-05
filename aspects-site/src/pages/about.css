@@ -1,57 +1,59 @@
 .about {
-  padding-top: var(--space-6);
+  padding-top: clamp(48px, 6vw, var(--space-6));
   overflow: hidden;
+  padding-bottom: var(--space-5);
 }
 
 .about__grid {
   display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  gap: var(--space-6);
+  grid-template-columns: 1.02fr 0.98fr;
+  gap: clamp(40px, 5vw, var(--space-6));
 }
 
 .about__num {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.22em;
   color: var(--ego-accent);
-  margin-bottom: var(--space-2);
+  margin-bottom: clamp(8px, 1vw, var(--space-2));
 }
 
 .about__title {
-  font-size: clamp(56px, 9vw, 118px);
+  font-size: clamp(58px, 9.5vw, 120px);
   font-weight: 700;
+  line-height: 0.86;
+  letter-spacing: 0.02em;
 }
 
-/* Soft prism-spectrum rule under the title, as in the draft */
 .about__rule {
   display: block;
   height: 2px;
-  width: min(420px, 80%);
-  margin-top: var(--space-3);
+  width: min(400px, 78%);
+  margin-top: clamp(14px, 1.8vw, var(--space-3));
   background: linear-gradient(
     90deg,
     var(--ink) 0%,
-    var(--ink) 55%,
-    rgba(214, 92, 83, 0.7) 68%,
-    rgba(243, 207, 122, 0.7) 78%,
-    rgba(92, 143, 214, 0.7) 89%,
-    rgba(160, 111, 209, 0.6) 100%
+    var(--ink) 52%,
+    rgba(214, 92, 83, 0.65) 66%,
+    rgba(243, 207, 122, 0.65) 76%,
+    rgba(92, 143, 214, 0.6) 88%,
+    rgba(160, 111, 209, 0.5) 100%
   );
 }
 
 .about__bio {
-  margin-top: var(--space-5);
+  margin-top: clamp(32px, 4vw, var(--space-5));
   display: grid;
-  gap: var(--space-4);
-  max-width: 54ch;
+  gap: clamp(20px, 2.5vw, var(--space-4));
+  max-width: var(--measure);
   font-size: 15px;
-  line-height: 1.8;
+  line-height: var(--leading-body);
   color: var(--ink-soft);
 }
 
 .about__quote {
-  margin: var(--space-5) 0 0;
-  padding-left: var(--space-4);
+  margin: clamp(32px, 4vw, var(--space-5)) 0 0;
+  padding-left: clamp(16px, 2vw, var(--space-4));
   border-left: 2px solid var(--ego-accent);
   display: flex;
   gap: var(--space-2);
@@ -59,48 +61,49 @@
 
 .about__quote-mark {
   font-family: var(--font-serif);
-  font-size: 40px;
-  line-height: 1;
+  font-size: 42px;
+  line-height: 0.85;
   color: var(--ego-accent);
+  opacity: 0.85;
 }
 
 .about__quote p {
   font-family: var(--font-serif);
   font-style: italic;
-  font-size: clamp(17px, 2vw, 21px);
-  line-height: 1.5;
+  font-size: clamp(18px, 2.1vw, 22px);
+  line-height: 1.45;
 }
 
 .about__roles {
   list-style: none;
-  margin: var(--space-5) 0 0;
+  margin: clamp(32px, 4vw, var(--space-5)) 0 0;
   padding: 0;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-3);
+  gap: clamp(12px, 1.5vw, var(--space-3));
 }
 
 .about__roles li {
   border-left: 1px solid var(--line);
-  padding-left: var(--space-3);
+  padding-left: clamp(12px, 1.5vw, var(--space-3));
 }
 
 .about__role-title {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   margin-bottom: 6px;
 }
 
 .about__role-dek {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--grey-500);
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 .about__press-label {
-  margin: var(--space-5) 0 var(--space-3);
+  margin: clamp(32px, 4vw, var(--space-5)) 0 clamp(12px, 1.5vw, var(--space-3));
 }
 
 .about__press {
@@ -109,25 +112,24 @@
   padding: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-3) var(--space-4);
+  gap: var(--space-3) clamp(16px, 2vw, var(--space-4));
   align-items: baseline;
 }
 
 .about__press li {
   font-family: var(--font-serif);
-  font-size: 15px;
-  letter-spacing: 0.05em;
+  font-size: 14px;
+  letter-spacing: 0.04em;
   color: var(--grey-300);
 }
 
 .about__ctas {
   display: flex;
-  gap: var(--space-3);
+  gap: clamp(12px, 1.5vw, var(--space-3));
   flex-wrap: wrap;
-  margin-top: var(--space-5);
+  margin-top: clamp(32px, 4vw, var(--space-5));
 }
 
-/* Portrait column */
 .about__portrait-col {
   position: relative;
 }
@@ -138,23 +140,24 @@
   aspect-ratio: 3 / 4;
   border-radius: var(--radius-sm);
   overflow: hidden;
+  box-shadow: var(--shadow-lift);
 }
 
-/* Glass prism rises from behind the portrait, as in the approved About draft */
 .about__prism {
   position: absolute;
-  right: -38%;
-  bottom: 10%;
-  width: 88%;
+  right: -36%;
+  bottom: 8%;
+  width: 86%;
   z-index: 0;
-  opacity: 0.95;
+  opacity: 0.92;
   pointer-events: none;
+  filter: drop-shadow(0 24px 48px rgba(11, 11, 12, 0.12));
 }
 
 @media (max-width: 960px) {
   .about__prism {
-    right: -20%;
-    width: 70%;
+    right: -18%;
+    width: 68%;
   }
 }
 
@@ -162,14 +165,14 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  margin-top: var(--space-6);
-  font-size: 11px;
-  letter-spacing: 0.2em;
+  margin-top: clamp(40px, 5vw, var(--space-6));
+  font-size: 10px;
+  letter-spacing: 0.22em;
   color: var(--grey-300);
 }
 
 .about__index-line {
-  width: 64px;
+  width: 56px;
   height: 1px;
   background: var(--grey-300);
 }
@@ -179,7 +182,7 @@
     grid-template-columns: 1fr;
   }
   .about__portrait-col {
-    max-width: 460px;
+    max-width: 440px;
   }
   .about__roles {
     grid-template-columns: repeat(2, 1fr);

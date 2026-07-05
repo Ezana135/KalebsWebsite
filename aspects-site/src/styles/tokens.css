@@ -10,10 +10,11 @@
   --ink: #0b0b0c;
   --ink-soft: #1a1a1c;
   --grey-500: #6b6b6a;
+  --grey-400: #8a8882;
   --grey-300: #a8a6a0;
   --grey-200: #d8d5cd;
-  --line: rgba(11, 11, 12, 0.12);
-  --line-dark: rgba(246, 244, 239, 0.14);
+  --line: rgba(11, 11, 12, 0.1);
+  --line-dark: rgba(246, 244, 239, 0.12);
 
   /* Chapter: Ego (gold) */
   --ego-accent: #c9962c;
@@ -59,6 +60,14 @@
   --space-7: 96px;
   --space-8: 144px;
 
+  /* Typography rhythm */
+  --leading-tight: 0.92;
+  --leading-display: 0.88;
+  --leading-body: 1.72;
+  --leading-serif: 1.65;
+  --measure: 62ch;
+  --measure-narrow: 42ch;
+
   --radius-sm: 4px;
   --radius-md: 10px;
   --radius-lg: 22px;
@@ -66,6 +75,13 @@
   --container: 1280px;
 
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Shadows — restrained, exhibition-light */
+  --shadow-soft: 0 12px 40px rgba(11, 11, 12, 0.08);
+  --shadow-lift: 0 20px 48px rgba(11, 11, 12, 0.14);
+  --shadow-prism: 0 24px 56px rgba(11, 11, 12, 0.18), 0 4px 12px rgba(11, 11, 12, 0.06);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 [data-theme='ego'] {
