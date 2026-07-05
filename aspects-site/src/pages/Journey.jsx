@@ -36,11 +36,9 @@ function scrollToSection(id) {
 
 function Hero() {
   return (
-    <section className="journey-hero" id="top" aria-label="ASPECTS">
+    <section className="journey-hero" id="hero" aria-label="ASPECTS">
       <div className="journey-hero__word" aria-hidden="true">
-        <span className="journey-hero__a">
-          <PrismGlass variant="flare" />
-        </span>
+        <span className="journey-hero__a" />
         <span className="journey-hero__spect">SPECTS</span>
       </div>
       <h1 className="visually-hidden">ASPECTS by Kaleb Kavuma</h1>
@@ -57,10 +55,8 @@ function PrismTransition() {
   return (
     <section ref={progressRef} className="prism-transition" id="prism" aria-label="The prism projector">
       <div className="prism-transition__stage">
-        <div className="prism-transition__ghost" aria-hidden="true">
-          ASPECTS
-        </div>
-        <div className="prism-transition__object">
+        <div className="prism-transition__ghost" aria-hidden="true">ASPECTS</div>
+        <div className="prism-transition__object" aria-hidden="true">
           <PrismGlass variant="beams" />
         </div>
       </div>
@@ -79,9 +75,6 @@ function MusicHub({ projectTo }) {
       <div className="journey-shell music-hub__grid">
         <div className="music-hub__left">
           <div className="music-hub__mast">
-            <div className="music-hub__prism" aria-hidden="true">
-              <PrismGlass variant="flare" />
-            </div>
             <div>
               <h2>MUSIC</h2>
               <p>Four chapters. One self.</p>
@@ -195,35 +188,15 @@ function ProjectorBreak({ id, theme, dark = false }) {
     >
       <div className="projector-break__stage">
         <span className="projector-break__curtain" />
-        <div className="projector-break__prism">
-          <PrismGlass variant="emit" tint={`var(--${theme}-beam)`} />
-        </div>
         <div className="projector-break__label">{id}</div>
       </div>
     </section>
   );
 }
 
-function ProjectionOverlay({ projection }) {
-  return (
-    <div
-      className={`projection-overlay ${projection ? 'is-running' : ''} projection-overlay--${projection?.theme || 'ego'}`}
-      aria-hidden="true"
-    >
-      <div className="projection-overlay__prism">
-        <PrismGlass variant="emit" tint={`var(--${projection?.theme || 'ego'}-beam)`} />
-      </div>
-      <span className="projection-overlay__label">{projection?.label}</span>
-    </div>
-  );
-}
-
 function EgoChapter({ chapter }) {
   return (
     <section className="chapter-world chapter-world--ego" id="ego" data-theme="ego" aria-label="Ego chapter">
-      <div className="chapter-world__prism chapter-world__prism--ego" aria-hidden="true">
-        <PrismGlass variant="emit" tint="rgba(215, 169, 72, 0.58)" />
-      </div>
       <div className="journey-shell ego-layout">
         <header className="ego-layout__head">
           <p><span>{chapter.number}</span> / {chapter.title}</p>
@@ -244,9 +217,6 @@ function EgoChapter({ chapter }) {
 function LoveChapter({ chapter }) {
   return (
     <section className="chapter-world chapter-world--love" id="love" data-theme="love" aria-label="Love chapter">
-      <div className="chapter-world__prism chapter-world__prism--love" aria-hidden="true">
-        <PrismGlass variant="emit" tint="rgba(84, 151, 226, 0.45)" />
-      </div>
       <div className="journey-shell love-layout">
         <header className="love-layout__head">
           <p><span>{chapter.number}</span> / {chapter.title}</p>
@@ -269,9 +239,6 @@ function LoveChapter({ chapter }) {
 function ReasonChapter({ chapter }) {
   return (
     <section className="chapter-world chapter-world--reason" id="reason" data-theme="reason" aria-label="Reason chapter">
-      <div className="chapter-world__prism chapter-world__prism--reason" aria-hidden="true">
-        <PrismGlass variant="emit" tint="rgba(206, 38, 34, 0.74)" />
-      </div>
       <div className="reason-layout">
         <div className="reason-layout__left">
           <header>
@@ -294,9 +261,6 @@ function ReasonChapter({ chapter }) {
 function ArtChapter({ chapter }) {
   return (
     <section className="chapter-world chapter-world--art" id="art" data-theme="art" aria-label="Art chapter">
-      <div className="chapter-world__prism chapter-world__prism--art" aria-hidden="true">
-        <PrismGlass variant="emit" tint="rgba(132, 74, 226, 0.72)" />
-      </div>
       <div className="journey-shell art-layout">
         <header className="art-layout__head">
           <p><span>{chapter.number}</span> / {chapter.title}</p>
@@ -351,9 +315,6 @@ function EssayPanel({ chapter, className = '', image }) {
 function FilmSection() {
   return (
     <section className="film-world" id="film" aria-label="Film">
-      <div className="film-world__prism" aria-hidden="true">
-        <PrismGlass variant="flare" />
-      </div>
       <div className="journey-shell film-world__grid">
         <header className="film-world__head">
           <p><span>09</span> / FILM</p>
@@ -393,23 +354,13 @@ function FilmSection() {
 
 export default function Journey() {
   const [ego, love, reason, art] = CHAPTERS;
-  const [projection, setProjection] = useState(null);
 
-  const projectTo = (id, theme, label) => {
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduceMotion) {
-      scrollToSection(id);
-      return;
-    }
-
-    setProjection({ theme, label });
-    window.setTimeout(() => scrollToSection(id), 180);
-    window.setTimeout(() => setProjection(null), 1050);
+  const projectTo = (id) => {
+    scrollToSection(id);
   };
 
   return (
     <div className="journey">
-      <ProjectionOverlay projection={projection} />
       <Hero />
       <PrismTransition />
       <MusicHub projectTo={projectTo} />
