@@ -4,14 +4,17 @@ import PrismMark from './PrismMark';
 import './nav.css';
 
 const LINKS = [
-  { to: '/music', label: 'Music' },
-  { to: '/journal', label: 'Journal' },
-  { to: '/film', label: 'Film' },
-  { to: '/about', label: 'About' },
+  { to: '/music', anchor: 'music', label: 'Music' },
+  { to: '/film', anchor: 'film', label: 'Visuals' },
+  { to: '/about', anchor: 'prism', label: 'About' },
   { to: '/contact', label: 'Contact' },
 ];
 
-export default function Nav({ dark = false }) {
+function scrollHome(id) {
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+export default function Nav({ dark = false, journey = false }) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -22,23 +25,44 @@ export default function Nav({ dark = false }) {
   }, [open]);
 
   return (
-    <header className={`nav ${dark ? 'nav--dark' : ''}`}>
+    <header className={`nav ${dark ? 'nav--dark' : ''} ${journey ? 'nav--journey' : ''}`}>
       <div className="container nav__inner">
-        <NavLink to="/" className="nav__brand" aria-label="ASPECTS home">
+        <NavLink
+          to="/"
+          className="nav__brand"
+          aria-label="ASPECTS home"
+          onClick={(event) => {
+            if (journey) {
+              event.preventDefault();
+              scrollHome('top');
+            }
+          }}
+        >
           <PrismMark size={20} />
           <span>KALEB KAVUMA</span>
         </NavLink>
 
         <nav className="nav__links" aria-label="Primary">
-          {LINKS.map((l) => (
-            <NavLink
-              key={l.to}
-              to={l.to}
-              className={({ isActive }) => `nav__link ${isActive ? 'is-active' : ''}`}
-            >
-              {l.label}
-            </NavLink>
-          ))}
+          {LINKS.map((l) =>
+            journey && l.anchor ? (
+              <button
+                key={l.label}
+                type="button"
+                className="nav__link"
+                onClick={() => scrollHome(l.anchor)}
+              >
+                {l.label}
+              </button>
+            ) : (
+              <NavLink
+                key={l.to}
+                to={l.to}
+                className={({ isActive }) => `nav__link ${isActive ? 'is-active' : ''}`}
+              >
+                {l.label}
+              </NavLink>
+            )
+          )}
         </nav>
 
         <button
@@ -58,9 +82,21 @@ export default function Nav({ dark = false }) {
           <ul>
             {LINKS.map((l) => (
               <li key={l.to}>
-                <NavLink to={l.to} onClick={() => setOpen(false)}>
-                  {l.label}
-                </NavLink>
+                {journey && l.anchor ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpen(false);
+                      scrollHome(l.anchor);
+                    }}
+                  >
+                    {l.label}
+                  </button>
+                ) : (
+                  <NavLink to={l.to} onClick={() => setOpen(false)}>
+                    {l.label}
+                  </NavLink>
+                )}
               </li>
             ))}
             <li>

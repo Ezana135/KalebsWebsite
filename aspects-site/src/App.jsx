@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Routes, Route, useLocation, useParams, Navigate } from 'react-router-dom';
 import Nav from './components/Nav';
 import Footer from './components/Footer';
-import Landing from './pages/Landing';
+import Journey from './pages/Journey';
 import Prism from './pages/Prism';
 import Chapter from './pages/Chapter';
 import About from './pages/About';
@@ -34,6 +34,7 @@ function ChapterRoute() {
 export default function App() {
   const { pathname } = useLocation();
   const dark = DARK_ROUTES.includes(pathname);
+  const journey = pathname === '/';
 
   return (
     <>
@@ -41,10 +42,10 @@ export default function App() {
         Skip to content
       </a>
       <ScrollToTop />
-      <Nav dark={dark} />
+      <Nav dark={dark} journey={journey} />
       <main id="main">
         <Routes>
-          <Route path="/" element={<Landing />} />
+          <Route path="/" element={<Journey />} />
           <Route path="/prism" element={<Prism />} />
           <Route path="/chapters/:slug" element={<ChapterRoute />} />
           <Route path="/about" element={<About />} />
@@ -56,7 +57,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
-      <Footer dark={dark} />
+      {!journey && <Footer dark={dark} />}
     </>
   );
 }
