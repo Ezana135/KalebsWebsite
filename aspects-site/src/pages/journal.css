@@ -1,0 +1,257 @@
+.journal {
+  padding-top: var(--space-6);
+}
+
+.journal__top {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.journal__title {
+  font-size: clamp(56px, 9vw, 128px);
+  font-weight: 700;
+}
+
+.journal__rule {
+  display: block;
+  height: 2px;
+  width: min(360px, 90%);
+  margin: var(--space-3) 0;
+  background: linear-gradient(
+    90deg,
+    var(--ink) 0%,
+    var(--ink) 45%,
+    rgba(243, 207, 122, 0.8) 62%,
+    rgba(214, 92, 83, 0.7) 75%,
+    rgba(92, 143, 214, 0.6) 88%,
+    rgba(160, 111, 209, 0.5) 100%
+  );
+}
+
+.journal__strap {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(16px, 1.8vw, 20px);
+  margin-bottom: var(--space-3);
+}
+
+.journal__lede {
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--grey-500);
+  max-width: 40ch;
+}
+
+/* Featured essay hero */
+.journal__featured {
+  display: block;
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  color: #f2f0ec;
+}
+
+.journal__featured-copy {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--space-5);
+  max-width: 46ch;
+  background: linear-gradient(90deg, rgba(8, 9, 11, 0.72) 0%, rgba(8, 9, 11, 0.25) 60%, transparent);
+}
+
+.journal__featured-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ego-accent-soft);
+  margin-bottom: var(--space-3);
+}
+
+.journal__featured-title {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  text-transform: none;
+  font-size: clamp(24px, 3vw, 38px);
+  line-height: 1.2;
+  margin-bottom: var(--space-3);
+}
+
+.journal__featured-dek {
+  font-size: 13px;
+  line-height: 1.7;
+  opacity: 0.85;
+  margin-bottom: var(--space-4);
+}
+
+.journal__featured-cta {
+  color: var(--ego-accent-soft);
+}
+
+/* Essay list */
+.journal__body {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: var(--space-5);
+  margin-top: var(--space-6);
+  align-items: start;
+}
+
+.journal__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.journal__row {
+  display: grid;
+  grid-template-columns: 110px 30px 1fr auto;
+  grid-template-areas:
+    'chapter prism title meta'
+    'chapter prism dek meta';
+  gap: 4px var(--space-4);
+  align-items: center;
+  padding: var(--space-4) var(--space-2);
+  border-top: 1px solid var(--line);
+  transition: background 0.25s;
+}
+
+.journal__list li:last-child .journal__row {
+  border-bottom: 1px solid var(--line);
+}
+
+.journal__row:hover {
+  background: rgba(11, 11, 12, 0.03);
+}
+
+.journal__row-chapter {
+  grid-area: chapter;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--chapter-colour);
+}
+
+.journal__row-prism {
+  grid-area: prism;
+}
+
+.journal__row-title {
+  grid-area: title;
+  font-family: var(--font-serif);
+  font-size: clamp(18px, 2vw, 24px);
+  font-weight: 600;
+}
+
+.journal__row-dek {
+  grid-area: dek;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--grey-500);
+  max-width: 52ch;
+}
+
+.journal__row-meta {
+  grid-area: meta;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.journal__row-meta em {
+  font-style: normal;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--grey-300);
+}
+
+.journal__row-meta .link-arrow {
+  color: var(--chapter-colour);
+}
+
+/* Subscribe panel */
+.journal__subscribe {
+  position: relative;
+  background: #0e0e10;
+  color: var(--off-white);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  overflow: hidden;
+}
+
+.journal__subscribe-inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.journal__subscribe-title {
+  font-family: var(--font-serif);
+  font-size: clamp(24px, 2.6vw, 34px);
+  line-height: 1.25;
+}
+
+.journal__subscribe-dek {
+  font-size: 13px;
+  line-height: 1.7;
+  opacity: 0.7;
+}
+
+.journal__subscribe .ecap {
+  margin: var(--space-2) 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.journal__subscribe .ecap__heading {
+  font-size: 13px;
+  letter-spacing: 0.26em;
+}
+
+.journal__subscribe .ecap__form input {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: var(--off-white);
+}
+
+.journal__subscribe .ecap__btn {
+  background: var(--ego-accent);
+}
+
+.journal__subscribe-prism {
+  position: absolute;
+  right: -10px;
+  bottom: -20px;
+  opacity: 0.6;
+  transform: rotate(8deg);
+}
+
+@media (max-width: 960px) {
+  .journal__top,
+  .journal__body {
+    grid-template-columns: 1fr;
+  }
+  .journal__row {
+    grid-template-columns: 30px 1fr;
+    grid-template-areas:
+      'prism chapter'
+      'prism title'
+      'prism dek'
+      'prism meta';
+  }
+  .journal__row-meta {
+    align-items: flex-start;
+    flex-direction: row;
+    gap: var(--space-3);
+    margin-top: 6px;
+  }
+}

@@ -1,0 +1,74 @@
+.manifesto {
+  padding-top: var(--space-6);
+}
+
+.manifesto__title {
+  font-size: clamp(52px, 9vw, 112px);
+  letter-spacing: 0.14em;
+  font-weight: 600;
+}
+
+/* Faint spectrum rule under the title, echoing light leaving the prism */
+.manifesto__rule {
+  display: block;
+  height: 1px;
+  width: 100%;
+  margin-top: var(--space-4);
+  background: linear-gradient(
+    90deg,
+    rgba(214, 92, 83, 0.5),
+    rgba(243, 207, 122, 0.5) 18%,
+    rgba(122, 194, 154, 0.4) 36%,
+    rgba(92, 143, 214, 0.4) 54%,
+    rgba(160, 111, 209, 0.35) 70%,
+    var(--line) 85%
+  );
+}
+
+.manifesto__reading {
+  max-width: 620px;
+  margin: var(--space-7) auto var(--space-6);
+  display: grid;
+  gap: var(--space-5);
+}
+
+.manifesto__reading p {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  line-height: 2;
+  color: var(--ink-soft);
+}
+
+.manifesto__thesis {
+  font-size: clamp(24px, 3.2vw, 34px) !important;
+  line-height: 1.35 !important;
+  color: var(--ink) !important;
+}
+
+.manifesto__signoff {
+  font-style: italic;
+}
+
+.manifesto__paths {
+  display: flex;
+  justify-content: flex-end;
+  align-items: baseline;
+  gap: var(--space-3);
+  font-family: var(--font-serif);
+  font-size: 16px;
+  color: var(--grey-500);
+}
+
+.manifesto__path {
+  color: var(--ink);
+  transition: opacity 0.2s;
+}
+
+.manifesto__path:hover {
+  opacity: 0.6;
+}
+
+.manifesto__path--underlined {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
