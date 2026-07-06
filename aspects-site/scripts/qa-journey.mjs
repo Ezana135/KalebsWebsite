@@ -142,6 +142,45 @@ const check = (ok, label) => {
   check(loveVisible, 'scrolled to love chapter after card click');
   await page.screenshot({ path: 'screenshots/qa/desktop-8-love-chapter.png' });
 
+  // Phase 1: spectrum beams off in chapter zones
+  const readSpectrum = () =>
+    page.$eval('.journey-prism', (el) => {
+      const read = (sel) => {
+        const node = el.querySelector(sel);
+        return node ? parseFloat(getComputedStyle(node).opacity) : 0;
+      };
+      return {
+        yellow: read('.beam--yellow'),
+        red: read('.beam--red'),
+        blue: read('.beam--blue'),
+        green: read('.beam--green'),
+      };
+    });
+
+  await page.evaluate(() => {
+    const ego = document.getElementById('ego');
+    const mid = ego.offsetTop + ego.offsetHeight * 0.5 - window.innerHeight * 0.5;
+    window.scrollTo({ top: mid, behavior: 'instant' });
+  });
+  await page.waitForTimeout(500);
+  const egoSpectrum = await readSpectrum();
+  check(
+    egoSpectrum.yellow === 0 && egoSpectrum.red === 0 && egoSpectrum.blue === 0 && egoSpectrum.green === 0,
+    `ego midpoint: spectrum off (y=${egoSpectrum.yellow} r=${egoSpectrum.red} b=${egoSpectrum.blue} g=${egoSpectrum.green})`
+  );
+
+  await page.evaluate(() => {
+    const love = document.getElementById('love');
+    const mid = love.offsetTop + love.offsetHeight * 0.5 - window.innerHeight * 0.5;
+    window.scrollTo({ top: mid, behavior: 'instant' });
+  });
+  await page.waitForTimeout(500);
+  const loveSpectrum = await readSpectrum();
+  check(
+    loveSpectrum.yellow === 0 && loveSpectrum.red === 0 && loveSpectrum.blue === 0 && loveSpectrum.green === 0,
+    `love midpoint: spectrum off (y=${loveSpectrum.yellow} r=${loveSpectrum.red} b=${loveSpectrum.blue} g=${loveSpectrum.green})`
+  );
+
   // film end
   await page.evaluate(() => document.getElementById('film').scrollIntoView({ behavior: 'instant' }));
   await page.waitForTimeout(800);

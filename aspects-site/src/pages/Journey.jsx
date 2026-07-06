@@ -1,10 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { CHAPTERS } from '../data/chapters';
+import {
+  computeLayerOpacities,
+  measureZoneRanges,
+  resolveZoneState,
+  ZONE_LABELS,
+} from '../data/journeyZones';
 import CoverArt from '../components/CoverArt';
 import EmailCapture from '../components/EmailCapture';
 import MediaFrame from '../components/MediaFrame';
 import PrismGlass from '../components/PrismGlass';
-import useScrollProgress from '../hooks/useScrollProgress';
 import './journey.css';
 
 const FEATURE_SCENES = {
@@ -34,45 +39,23 @@ function scrollToSection(id) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// The chapter light each phase makes the travelling prism emit,
-// and the projector label shown beside it once it docks.
-const PRISM_TINTS = {
-  ego: 'var(--ego-beam)',
-  love: 'var(--love-beam)',
-  reason: 'var(--reason-beam)',
-  art: 'var(--art-beam)',
-  film: 'var(--film-beam)',
-};
-
-const PRISM_LABELS = {
-  ego: '01 / EGO',
-  love: '02 / LOVE',
-  reason: '03 / REASON',
-  art: '04 / ART',
-  film: '09 / FILM',
-};
+function JourneyAtmosphere() {
+  return <div className="journey-atmosphere" aria-hidden="true" />;
+}
 
 /**
- * The single prism that travels the whole journey. It starts as the "A" of
- * ASPECTS in the hero, glides to centre stage for the refraction transition,
- * then docks on the left as the projector that lights every chapter.
- * Position/size come from --prism-x/y/w set by the scroll loop in Journey.
+ * Persistent prism for the whole journey. Visual state is driven entirely by
+ * CSS variables written by the scroll loop — no remounts, no phase classes.
  */
-function JourneyPrism({ phase, projecting, prismRef }) {
+function JourneyPrism({ projecting, prismRef, labelRef }) {
   return (
     <div
       ref={prismRef}
-      className={`journey-prism journey-prism--${phase} ${projecting ? 'is-projecting' : ''}`}
+      className={`journey-prism ${projecting ? 'is-projecting' : ''}`}
       aria-hidden="true"
     >
-      {/* key restarts the light animations whenever the prism enters a new phase */}
-      <PrismGlass
-        key={phase}
-        variant="journey"
-        tint={PRISM_TINTS[phase]}
-        emitAngle={phase === 'reason' ? 'down' : 'right'}
-      />
-      {PRISM_LABELS[phase] && <span className="journey-prism__label">{PRISM_LABELS[phase]}</span>}
+      <PrismGlass variant="journey" />
+      <span ref={labelRef} className="journey-prism__label" />
     </div>
   );
 }
@@ -93,11 +76,8 @@ function Hero({ anchorRef }) {
 }
 
 function PrismTransition() {
-  const progressRef = useScrollProgress('--prism-p');
-
   return (
     <section
-      ref={progressRef}
       className="prism-transition"
       id="prism"
       data-journey-phase="prism"
@@ -235,11 +215,8 @@ function MusicHub({ projectTo }) {
 }
 
 function ProjectorBreak({ label, theme, dark = false }) {
-  const progressRef = useScrollProgress('--project-p');
-
   return (
     <section
-      ref={progressRef}
       className={`projector-break projector-break--${theme} ${dark ? 'projector-break--dark' : ''}`}
       data-journey-phase={theme}
       aria-hidden="true"
@@ -413,10 +390,10 @@ function FilmSection() {
 export default function Journey() {
   const [ego, love, reason, art] = CHAPTERS;
   const [projection, setProjection] = useState(null);
-  const [phase, setPhase] = useState('hero');
   const rootRef = useRef(null);
   const heroAnchorRef = useRef(null);
   const prismRef = useRef(null);
+  const labelRef = useRef(null);
 
   const projectTo = (id, theme, label) => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -429,8 +406,6 @@ export default function Journey() {
     window.setTimeout(() => setProjection(null), 1050);
   };
 
-  // Drives the single travelling prism: hero "A" -> centre stage during the
-  // pinned refraction transition -> left projector dock for the chapters.
   useEffect(() => {
     const root = rootRef.current;
     const prism = prismRef.current;
@@ -438,27 +413,22 @@ export default function Journey() {
     const pinSection = root?.querySelector('#prism');
     if (!root || !prism || !heroAnchor || !pinSection) return undefined;
 
-    const phaseSections = Array.from(root.querySelectorAll('[data-journey-phase]'));
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
     const clamp01 = (value) => Math.min(1, Math.max(0, value));
     const easeOut = (t) => 1 - (1 - t) ** 3;
     const lerp = (a, b, t) => a + (b - a) * t;
+
+    let zoneRanges = measureZoneRanges(root);
+
+    const formatColor = (color) => (Array.isArray(color) ? color.join(' ') : color);
 
     let raf = 0;
     const update = () => {
       raf = 0;
       const vw = window.innerWidth;
       const vh = window.innerHeight;
+      const scrollCenter = window.scrollY + vh * 0.5;
 
-      // The section owning the prism = last one whose top passed viewport centre.
-      let active = 'hero';
-      for (const section of phaseSections) {
-        if (section.getBoundingClientRect().top <= vh * 0.5) active = section.dataset.journeyPhase;
-      }
-      setPhase(active);
-
-      // The three stations the prism travels between (viewport coordinates).
       const heroRect = heroAnchor.getBoundingClientRect();
       const hero = {
         x: heroRect.left + heroRect.width / 2,
@@ -475,13 +445,8 @@ export default function Journey() {
 
       const rect = pinSection.getBoundingClientRect();
       const span = rect.height - vh;
-      const p = span > 0 ? clamp01(-rect.top / span) : 1;
-      // How far the pinned stage has scrolled off the top once the pin ends.
+      const prismProgress = span > 0 ? clamp01(-rect.top / span) : 1;
       const exit = span > 0 ? clamp01((-rect.top - span) / (vh * 0.9)) : 1;
-
-      // Approach: distance the transition section has entered the viewport,
-      // normalised so the prism leaves the hero "A" as the section arrives
-      // and reaches centre stage just past halfway through the pin.
       const approach = clamp01((vh - rect.top) / (vh + span * 0.55));
 
       let x;
@@ -489,36 +454,61 @@ export default function Journey() {
       let w;
       if (reduceMotion) {
         ({ x, y, w } = rect.top > 0 ? hero : dock);
-      } else if (p < 1) {
-        const t = easeOut(approach); // glued to the "A", then glides to centre
+      } else if (prismProgress < 1) {
+        const t = easeOut(approach);
         x = lerp(hero.x, centre.x, t);
         y = lerp(hero.y, centre.y, t);
         w = lerp(hero.w, centre.w, t);
       } else {
-        const t = easeOut(exit); // hands off from centre stage to the dock
+        const t = easeOut(exit);
         x = lerp(centre.x, dock.x, t);
         y = lerp(centre.y, dock.y, t);
         w = lerp(centre.w, dock.w, t);
       }
 
+      const zoneState = resolveZoneState(zoneRanges, scrollCenter);
+      const layers = computeLayerOpacities(zoneState, prismProgress);
+
       prism.style.setProperty('--prism-x', `${x.toFixed(2)}px`);
       prism.style.setProperty('--prism-y', `${y.toFixed(2)}px`);
       prism.style.setProperty('--prism-w', `${w.toFixed(2)}px`);
-      prism.style.setProperty('--prism-p', reduceMotion ? '1' : p.toFixed(4));
+
+      root.style.setProperty('--zone-color', formatColor(layers.zoneColor));
+      root.style.setProperty('--zone-p', zoneState.zoneProgress.toFixed(4));
+      root.style.setProperty('--prism-p', reduceMotion ? '1' : prismProgress.toFixed(4));
+      root.style.setProperty('--spectrum-opacity', layers.spectrumOpacity.toFixed(4));
+      root.style.setProperty('--projector-opacity', layers.projectorOpacity.toFixed(4));
+      root.style.setProperty('--incoming-opacity', layers.incomingOpacity.toFixed(4));
+      root.style.setProperty('--flare-opacity', layers.flareOpacity.toFixed(4));
+      root.style.setProperty('--bg-darkness', layers.bgDarkness.toFixed(4));
+      root.style.setProperty('--emit-angle', `${layers.emitAngle.toFixed(2)}deg`);
+      root.dataset.zoneDark = layers.bgDarkness > 0.5 ? 'true' : 'false';
+
+      const label = labelRef.current;
+      if (label) {
+        const labelText = ZONE_LABELS[zoneState.zone.id] || '';
+        label.textContent = labelText;
+        label.style.opacity = labelText && layers.projectorOpacity > 0.2 ? '0.8' : '0';
+      }
+    };
+
+    const remeasure = () => {
+      zoneRanges = measureZoneRanges(root);
+      update();
     };
 
     const schedule = () => {
       if (!raf) raf = requestAnimationFrame(update);
     };
 
-    update();
+    remeasure();
     window.addEventListener('scroll', schedule, { passive: true });
-    window.addEventListener('resize', schedule);
-    const ro = new ResizeObserver(schedule);
+    window.addEventListener('resize', remeasure);
+    const ro = new ResizeObserver(remeasure);
     ro.observe(root);
     return () => {
       window.removeEventListener('scroll', schedule);
-      window.removeEventListener('resize', schedule);
+      window.removeEventListener('resize', remeasure);
       ro.disconnect();
       if (raf) cancelAnimationFrame(raf);
     };
@@ -526,8 +516,9 @@ export default function Journey() {
 
   return (
     <div className="journey" ref={rootRef}>
+      <JourneyAtmosphere />
       <ProjectionOverlay projection={projection} />
-      <JourneyPrism phase={phase} projecting={Boolean(projection)} prismRef={prismRef} />
+      <JourneyPrism projecting={Boolean(projection)} prismRef={prismRef} labelRef={labelRef} />
       <Hero anchorRef={heroAnchorRef} />
       <PrismTransition />
       <MusicHub projectTo={projectTo} />

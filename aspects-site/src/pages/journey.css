@@ -4,9 +4,41 @@
   --reason-beam: rgba(211, 32, 31, 0.76);
   --art-beam: rgba(131, 76, 228, 0.74);
   --film-beam: rgba(210, 218, 226, 0.42);
-  background: #fff;
+  --zone-color: 255 255 255;
+  --zone-p: 0;
+  --prism-p: 0;
+  --spectrum-opacity: 0;
+  --projector-opacity: 0;
+  --incoming-opacity: 0;
+  --flare-opacity: 0;
+  --bg-darkness: 0;
+  --emit-angle: 0deg;
+  position: relative;
+  background: rgb(
+    calc(255 * (1 - var(--bg-darkness))),
+    calc(255 * (1 - var(--bg-darkness))),
+    calc(255 * (1 - var(--bg-darkness)))
+  );
   color: var(--ink);
-  overflow: clip;
+  overflow-x: clip;
+  overflow-y: visible;
+}
+
+.journey-atmosphere {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 0% 45%, rgb(var(--zone-color) / 0.28), transparent 48%),
+    radial-gradient(ellipse at 50% 100%, rgb(var(--zone-color) / 0.14), transparent 60%);
+  opacity: calc(0.35 + var(--projector-opacity) * 0.55);
+  transition: opacity 120ms linear;
+}
+
+.journey > :not(.journey-atmosphere) {
+  position: relative;
+  z-index: 1;
 }
 
 .journey-shell {
@@ -138,7 +170,7 @@
 
 .music-hub {
   padding: 76px 0 60px;
-  background: #f7f6f2;
+  background: transparent;
   border-radius: 0 0 78px 78px;
 }
 
@@ -466,17 +498,14 @@
 }
 
 .projector-break {
-  --project-p: 0;
   height: 135svh;
   position: relative;
   overflow: visible;
-  background: #fff;
+  background: transparent;
 }
 
 .projector-break--dark {
-  background:
-    radial-gradient(ellipse at 0% 55%, rgba(255, 255, 255, 0.06), transparent 30%),
-    #050506;
+  background: transparent;
 }
 
 .projector-break--ego {
@@ -513,7 +542,7 @@
 }
 
 .projector-break--dark .projector-break__curtain {
-  opacity: clamp(0, calc((var(--project-p) - 0.04) * 2.7), 0.92);
+  opacity: clamp(0, calc((var(--zone-p) - 0.04) * 2.7), 0.92);
 }
 
 
@@ -527,8 +556,8 @@
   font-weight: 900;
   letter-spacing: 0.32em;
   color: color-mix(in srgb, var(--accent) 60%, currentColor);
-  opacity: clamp(0, calc((var(--project-p) - 0.28) * 3.5), 1);
-  transform: translateX(calc((1 - var(--project-p)) * 26vw));
+  opacity: clamp(0, calc((var(--zone-p) - 0.28) * 3.5), 1);
+  transform: translateX(calc((1 - var(--zone-p)) * 26vw));
 }
 
 .projector-break::after {
@@ -536,8 +565,8 @@
   position: absolute;
   inset: auto 0 0;
   height: 34%;
-  background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--accent, #fff) 18%, transparent));
-  opacity: clamp(0, calc((var(--project-p) - 0.58) * 2.4), 0.65);
+  background: linear-gradient(180deg, transparent, rgb(var(--zone-color) / 0.18));
+  opacity: clamp(0, calc((var(--zone-p) - 0.58) * 2.4), 0.65);
   pointer-events: none;
 }
 
@@ -569,17 +598,8 @@
   width: var(--prism-w, 300px);
   transform: translate3d(calc(var(--prism-x, 50vw) - 50%), calc(var(--prism-y, 50vh) - 50%), 0);
   pointer-events: none;
-  /* multiply lets the paper-white interior of the photographed prism
-     disappear into light pages, leaving only the glass and its light */
-  mix-blend-mode: multiply;
+  opacity: calc(0.55 + var(--projector-opacity) * 0.45);
   will-change: transform, width;
-}
-
-/* dark chapters flip to screen so the prism glows like a projector lens */
-.journey-prism--reason,
-.journey-prism--art,
-.journey-prism--film {
-  mix-blend-mode: screen;
 }
 
 .journey-prism .prism-glass {
@@ -600,115 +620,48 @@
   text-transform: uppercase;
   white-space: nowrap;
   color: #17181c;
-  opacity: 0.8;
+  opacity: 0;
   transform: translateY(-50%);
-  animation: journey-label-in 900ms var(--ease) both;
 }
 
-.journey-prism--reason .journey-prism__label,
-.journey-prism--art .journey-prism__label,
-.journey-prism--film .journey-prism__label {
+.journey[data-zone-dark='true'] .journey-prism__label {
   color: var(--off-white);
 }
 
-@keyframes journey-label-in {
-  from {
-    opacity: 0;
-    transform: translateY(-50%) translateX(-14px);
-  }
-  to {
-    opacity: 0.8;
-    transform: translateY(-50%) translateX(0);
-  }
-}
-
-/* light layers: everything exists on the one prism, phases fade layers in */
+/* Light layers: numeric opacity from the scroll timeline */
 .journey-prism .beam,
 .journey-prism .prism-glass__incoming,
-.journey-prism .prism-glass__emit {
-  opacity: 0;
+.journey-prism .prism-glass__emit,
+.journey-prism .prism-glass__flare {
   animation: none;
 }
 
-/* pinned refraction: white light in, then the spectrum fans out, all
-   scroll-linked through --prism-p */
-.journey-prism--prism .beam--white {
-  opacity: clamp(0, calc((var(--prism-p) - 0.14) * 4.5), 1);
-  scale: clamp(0.08, calc((var(--prism-p) - 0.08) * 2.2), 1) 1;
+.journey-prism .beam--white {
+  opacity: var(--incoming-opacity);
 }
 
-.journey-prism--prism .beam--yellow,
-.journey-prism--prism .beam--red,
-.journey-prism--prism .beam--blue,
-.journey-prism--prism .beam--green {
-  opacity: clamp(0, calc((var(--prism-p) - 0.34) * 4), 0.92);
-  scale: clamp(0.06, calc((var(--prism-p) - 0.3) * 2), 1) 1;
+.journey-prism .beam--yellow,
+.journey-prism .beam--red,
+.journey-prism .beam--blue,
+.journey-prism .beam--green {
+  opacity: calc(var(--spectrum-opacity) * 0.92);
 }
 
-.journey-prism--prism .prism-glass__halo {
-  opacity: clamp(0.35, calc(var(--prism-p) * 1.2), 1);
+.journey-prism .prism-glass__incoming {
+  opacity: calc(var(--incoming-opacity) * 0.85);
 }
 
-/* music hub: the prism ghosts back so the shelf stays readable, while the
-   full spectrum lingers softly across the cards */
-.journey-prism--music {
-  opacity: 0.55;
-  transition: opacity 700ms var(--ease);
+.journey-prism .prism-glass__emit {
+  opacity: var(--projector-opacity);
+  transform: rotate(var(--emit-angle, 0deg));
 }
 
-.journey-prism--music .beam--white {
-  opacity: 0.55;
+.journey-prism .prism-glass__flare {
+  opacity: var(--flare-opacity);
 }
 
-.journey-prism--music .beam--yellow,
-.journey-prism--music .beam--red,
-.journey-prism--music .beam--blue,
-.journey-prism--music .beam--green {
-  opacity: 0.42;
-  animation: journey-light-in 900ms var(--ease) both;
-}
-
-/* chapters: incoming white light + one chapter-tinted beam projecting out */
-.journey-prism--ego .prism-glass__incoming,
-.journey-prism--love .prism-glass__incoming,
-.journey-prism--reason .prism-glass__incoming,
-.journey-prism--art .prism-glass__incoming,
-.journey-prism--film .prism-glass__incoming {
-  opacity: 1;
-  animation: journey-light-in 900ms var(--ease) both;
-}
-
-.journey-prism--ego .prism-glass__emit,
-.journey-prism--love .prism-glass__emit,
-.journey-prism--reason .prism-glass__emit,
-.journey-prism--art .prism-glass__emit,
-.journey-prism--film .prism-glass__emit {
-  opacity: 0.82;
-  animation:
-    journey-emit-in 1100ms var(--ease) both,
-    emit-shimmer 5s ease-in-out 1.2s infinite;
-}
-
-/* draw-in uses the scale property so Reason's rotate() transform survives */
-@keyframes journey-emit-in {
-  from {
-    opacity: 0;
-    scale: 0.08 1;
-  }
-  to {
-    opacity: 0.82;
-    scale: 1 1;
-  }
-}
-
-@keyframes journey-light-in {
-  from {
-    opacity: 0;
-    scale: 0 1;
-  }
-  to {
-    scale: 1 1;
-  }
+.journey-prism .prism-glass__halo {
+  opacity: calc(0.35 + var(--prism-p) * 0.65);
 }
 
 .projection-overlay.is-running {
@@ -847,10 +800,7 @@
 
 .chapter-world--ego {
   padding: 82px 0 54px;
-  background:
-    radial-gradient(ellipse at 12% 28%, rgba(215, 169, 72, 0.28), transparent 42%),
-    linear-gradient(100deg, rgba(215, 169, 72, 0.12), transparent 45%),
-    #fff;
+  background: transparent;
 }
 
 .ego-layout {
@@ -992,10 +942,7 @@
 
 .chapter-world--love {
   padding: 72px 0 46px;
-  background:
-    radial-gradient(ellipse at 4% 44%, rgba(57, 147, 239, 0.42), transparent 37%),
-    linear-gradient(115deg, rgba(75, 155, 238, 0.19), transparent 42%),
-    #fffaf5;
+  background: transparent;
 }
 
 .love-layout {
@@ -1052,10 +999,7 @@
 }
 
 .chapter-world--reason {
-  background:
-    radial-gradient(ellipse at 4% 55%, rgba(231, 16, 24, 0.5), transparent 34%),
-    radial-gradient(ellipse at 72% 12%, rgba(217, 162, 51, 0.13), transparent 40%),
-    #070706;
+  background: transparent;
   color: #f4efe8;
 }
 
@@ -1115,10 +1059,7 @@
 
 .chapter-world--art {
   padding: 78px 0 38px;
-  background:
-    radial-gradient(ellipse at 0% 45%, rgba(141, 73, 239, 0.56), transparent 36%),
-    radial-gradient(ellipse at 70% 20%, rgba(232, 185, 138, 0.18), transparent 36%),
-    linear-gradient(110deg, #07040e, #13091f 54%, #07040e);
+  background: transparent;
   color: #f4edff;
 }
 
@@ -1483,13 +1424,7 @@
   .journey-prism__label,
   .journey-prism .prism-glass__incoming,
   .journey-prism .prism-glass__emit,
-  .journey-prism .beam,
-  .music-hub__grid,
-  .ego-layout,
-  .love-layout,
-  .reason-layout,
-  .art-layout,
-  .film-world__grid {
+  .journey-prism .beam {
     animation: none;
   }
 

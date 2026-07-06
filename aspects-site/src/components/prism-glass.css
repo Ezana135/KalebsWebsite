@@ -102,7 +102,7 @@
   position: absolute;
   left: 46%;
   top: 44%;
-  width: 260vw;
+  width: 180vw;
   height: 38%;
   background:
     linear-gradient(94deg, var(--emit, rgba(255, 255, 255, 0.5)), color-mix(in srgb, var(--emit, rgba(255, 255, 255, 0.5)) 52%, transparent) 22%, transparent 80%),
@@ -114,6 +114,20 @@
   pointer-events: none;
   transform-origin: left center;
   animation: emit-shimmer 5s ease-in-out infinite;
+}
+
+/* Journey homepage: emit color comes from the scroll timeline */
+.prism-glass--journey .prism-glass__emit {
+  --emit: rgb(var(--zone-color) / 0.62);
+  animation: none;
+}
+
+.prism-glass--journey .prism-glass__incoming {
+  animation: none;
+}
+
+.prism-glass--journey .prism-glass__flare {
+  animation: none;
 }
 
 /* Reason draft: the emitted beam angles down-right across the page */
