@@ -133,6 +133,194 @@
   z-index: 0;
 }
 
+.opening-scene__appendix {
+  position: absolute;
+  right: clamp(18px, 4vw, 72px);
+  top: 50%;
+  transform: translateY(-42%);
+  z-index: 5;
+  display: grid;
+  gap: clamp(18px, 3.2vh, 34px);
+  width: min(280px, 24vw);
+  opacity: clamp(0, calc((var(--opening-p) - 0.72) * 4), 1);
+}
+
+.opening-scene__appendix-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: 4px 14px;
+  padding: 12px 14px 12px 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+  transition: transform 220ms var(--ease), opacity 220ms var(--ease);
+}
+
+.opening-scene__appendix-item:hover,
+.opening-scene__appendix-item:focus-visible {
+  transform: translateX(-6px);
+}
+
+.opening-scene__appendix-line {
+  position: absolute;
+  left: -18vw;
+  top: 50%;
+  width: 16vw;
+  height: 3px;
+  transform: translateY(-50%);
+  opacity: 0.45;
+  filter: blur(1px);
+}
+
+.opening-scene__appendix-item--ego .opening-scene__appendix-line {
+  background: linear-gradient(270deg, rgba(246, 207, 62, 0.9), transparent);
+}
+
+.opening-scene__appendix-item--love .opening-scene__appendix-line {
+  background: linear-gradient(270deg, rgba(64, 129, 255, 0.82), transparent);
+  top: 62%;
+}
+
+.opening-scene__appendix-num {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  opacity: 0.55;
+  align-self: center;
+}
+
+.opening-scene__appendix-item strong {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 2.8vw, 42px);
+  font-weight: 900;
+  line-height: 0.9;
+}
+
+.opening-scene__appendix-item em {
+  grid-column: 2;
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-style: italic;
+  opacity: 0.72;
+}
+
+.opening-scene__appendix-item--ego strong {
+  color: #c9962c;
+}
+
+.opening-scene__appendix-item--love strong {
+  color: #4a86cf;
+}
+
+.chapter-passage {
+  --passage-p: 0;
+  --wash-p: clamp(0, calc((var(--passage-p) - 0.12) / 0.72), 1);
+  height: 200svh;
+  position: relative;
+  background: #fff;
+}
+
+.chapter-passage__stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+}
+
+.chapter-passage__wash {
+  position: absolute;
+  inset: 0;
+  opacity: calc(var(--wash-p) * 0.22);
+  pointer-events: none;
+}
+
+.chapter-passage--ego .chapter-passage__wash {
+  background:
+    linear-gradient(102deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 248, 230, 0.5) 18%, rgba(218, 176, 80, 0.18) 42%, transparent 68%),
+    radial-gradient(ellipse 40% 50% at 8% 48%, rgba(218, 176, 80, 0.28), transparent 70%);
+}
+
+.chapter-passage--love .chapter-passage__wash {
+  background:
+    linear-gradient(108deg, rgba(255, 255, 255, 0.94) 0%, rgba(230, 242, 255, 0.55) 20%, rgba(90, 150, 220, 0.2) 44%, transparent 70%),
+    radial-gradient(ellipse 42% 52% at 9% 46%, rgba(90, 150, 220, 0.32), transparent 72%);
+}
+
+.chapter-projector {
+  --chapter-p: 0;
+  --projector-p: clamp(0, calc(var(--chapter-p) / 0.4), 1);
+  --content-p: clamp(0, calc((var(--chapter-p) - 0.34) / 0.42), 1);
+  position: relative;
+  height: 320svh;
+  background: #fff;
+  overflow: clip;
+}
+
+.chapter-projector__wash {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: calc(0.18 + var(--projector-p) * 0.62);
+  transition: opacity 120ms linear;
+}
+
+.chapter-projector--ego .chapter-projector__wash {
+  background:
+    linear-gradient(104deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 236, 190, 0.42) 16%, rgba(218, 176, 80, 0.34) 34%, transparent 62%),
+    radial-gradient(ellipse 48% 58% at 6% 36%, rgba(218, 176, 80, 0.42), transparent 68%);
+}
+
+.chapter-projector--love .chapter-projector__wash {
+  background:
+    linear-gradient(108deg, rgba(255, 255, 255, 0.16) 0%, rgba(210, 232, 255, 0.48) 18%, rgba(90, 150, 220, 0.36) 36%, transparent 64%),
+    radial-gradient(ellipse 50% 60% at 7% 40%, rgba(90, 150, 220, 0.44), transparent 70%);
+}
+
+.chapter-projector__stage {
+  position: sticky;
+  top: 0;
+  min-height: 100svh;
+  z-index: 1;
+  padding: clamp(48px, 8vh, 92px) 0 clamp(40px, 6vh, 72px);
+}
+
+.chapter-projector .ego-layout__content,
+.chapter-projector .love-layout__content {
+  opacity: var(--content-p);
+  transform: translateY(calc((1 - var(--content-p)) * 42px));
+  filter: blur(calc((1 - var(--content-p)) * 3px));
+}
+
+.chapter-projector .ego-layout__head,
+.chapter-projector .love-layout__head {
+  opacity: calc(0.35 + var(--projector-p) * 0.65);
+  transform: translateY(calc((1 - var(--projector-p)) * 28px));
+}
+
+.journey-link--button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 22px;
+  border-radius: 4px;
+  background: var(--accent, var(--ego-accent));
+  color: #111;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+}
+
+.ego-layout__tracks .journey-link--button {
+  background: var(--ego-accent);
+  color: #10161f;
+}
+
 .music-hub {
   padding: 76px 0 60px;
   background: #f7f6f2;
@@ -601,6 +789,23 @@
   transition: opacity 280ms linear;
 }
 
+.journey-prism.is-spectrum .prism-glass__beams {
+  opacity: 1;
+}
+
+.journey-prism:not(.is-spectrum) .prism-glass__beams {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.journey-prism.is-emitting .prism-glass__emit {
+  opacity: var(--emit-opacity, 0);
+}
+
+.journey-prism .prism-glass__incoming {
+  opacity: var(--incoming-opacity, 0);
+}
+
 .journey-prism .beam--white {
   opacity: var(--white-beam);
   transform: scaleX(clamp(0.06, var(--white-beam), 1));
@@ -805,12 +1010,14 @@
 
 
 
-.chapter-world--ego {
-  padding: 82px 0 54px;
-  background:
-    radial-gradient(ellipse at 12% 28%, rgba(215, 169, 72, 0.28), transparent 42%),
-    linear-gradient(100deg, rgba(215, 169, 72, 0.12), transparent 45%),
-    #fff;
+.chapter-world--ego,
+.chapter-projector--ego {
+  --accent: var(--ego-accent);
+}
+
+.chapter-projector--ego {
+  padding: 0;
+  background: #fff;
 }
 
 .ego-layout {
@@ -824,10 +1031,18 @@
 
 .ego-layout__head {
   grid-column: 1 / -1;
-  padding-left: 150px;
+  padding-left: clamp(120px, 11vw, 180px);
 }
 
 .ego-layout__head p,
+.chapter-projector--love .love-layout__head p {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  display: block;
+}
+
 .love-layout__head p,
 .reason-layout header p,
 .art-layout__head p,
@@ -843,7 +1058,11 @@
 .reason-layout header p,
 .art-layout__head p,
 .film-world__head p {
-  display: none;
+  display: block;
+}
+
+.ego-layout__content {
+  display: contents;
 }
 
 .ego-layout__head span,
@@ -958,12 +1177,14 @@
   margin-bottom: 34px;
 }
 
-.chapter-world--love {
-  padding: 72px 0 46px;
-  background:
-    radial-gradient(ellipse at 4% 44%, rgba(57, 147, 239, 0.42), transparent 37%),
-    linear-gradient(115deg, rgba(75, 155, 238, 0.19), transparent 42%),
-    #fffaf5;
+.chapter-world--love,
+.chapter-projector--love {
+  --accent: var(--love-accent-soft);
+}
+
+.chapter-projector--love {
+  padding: 0;
+  background: #fffaf5;
 }
 
 .love-layout {
@@ -977,8 +1198,12 @@
 
 .love-layout__head {
   grid-row: span 2;
-  padding: 90px 0 0 170px;
+  padding: clamp(20px, 4vh, 48px) 0 0 clamp(120px, 11vw, 180px);
   color: var(--love-navy);
+}
+
+.love-layout__content {
+  display: contents;
 }
 
 .love-layout__head strong {
@@ -1009,10 +1234,15 @@
 .love-layout__portrait {
   min-height: 190px;
   border-radius: 7px;
-  background:
-    radial-gradient(ellipse 30% 24% at 52% 24%, #1d1713 0 55%, transparent 57%),
-    radial-gradient(ellipse 55% 50% at 50% 94%, #6f4d35 0 58%, transparent 60%),
-    linear-gradient(145deg, #a5b481, #4f5d36);
+  overflow: hidden;
+  background: #d8cfc2;
+}
+
+.love-layout__portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 18%;
 }
 
 .love-layout__email {

@@ -1,28 +1,20 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { CHAPTERS } from '../data/chapters';
-import CoverArt from '../components/CoverArt';
 import EmailCapture from '../components/EmailCapture';
 import MediaFrame from '../components/MediaFrame';
 import PrismGlass from '../components/PrismGlass';
 import useScrollProgress from '../hooks/useScrollProgress';
 import './journey.css';
 
-const FEATURE_SCENES = {
-  ego: 'ego-mirror',
-  love: 'love-lake',
-  reason: 'reason-archive',
-  art: 'art-collage',
+const RELEASED = CHAPTERS.filter((chapter) => chapter.status === 'released');
+const PHASE_ONE_CHAPTERS = RELEASED.filter((chapter) => chapter.id === 'ego' || chapter.id === 'love');
+
+const EMIT_COLORS = {
+  ego: 'rgba(218, 176, 80, 0.72)',
+  love: 'rgba(90, 150, 220, 0.68)',
+  reason: 'rgba(211, 50, 48, 0.72)',
+  art: 'rgba(150, 80, 230, 0.7)',
 };
-
-const FILM_CHAPTERS = [
-  { id: 'ego', num: '01', title: 'EGO', dek: 'The self we build. The stories we believe.' },
-  { id: 'love', num: '02', title: 'LOVE', dek: 'The distance. The devotion. The return.' },
-  { id: 'reason', num: '03', title: 'REASON', dek: 'The search. The questions. The why.' },
-  { id: 'art', num: '04', title: 'ART', dek: 'The expression. The process. The becoming.' },
-  { id: 'soon', num: '05', title: 'COMING SOON', dek: 'The final chapter. Coming soon.' },
-];
-
-const CHAPTER_THEMES = ['ego', 'love', 'reason', 'art', 'film'];
 
 function PlayIcon() {
   return (
@@ -36,7 +28,7 @@ function scrollToSection(id) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function OpeningScene() {
+function OpeningScene({ projectTo }) {
   const progressRef = useScrollProgress('--opening-p');
 
   return (
@@ -53,6 +45,22 @@ function OpeningScene() {
         </div>
 
         <div className="opening-scene__ghost" aria-hidden="true">ASPECTS</div>
+
+        <nav className="opening-scene__appendix" aria-label="Chapter index">
+          {PHASE_ONE_CHAPTERS.map((chapter) => (
+            <button
+              key={chapter.id}
+              type="button"
+              className={`opening-scene__appendix-item opening-scene__appendix-item--${chapter.id}`}
+              onClick={() => projectTo(chapter.id, chapter.id, `${chapter.number} / ${chapter.title}`)}
+            >
+              <span className="opening-scene__appendix-line" aria-hidden="true" />
+              <span className="opening-scene__appendix-num">{chapter.number}</span>
+              <strong>{chapter.title}</strong>
+              <em>{chapter.subhead}</em>
+            </button>
+          ))}
+        </nav>
       </div>
     </section>
   );
@@ -69,165 +77,60 @@ function ProjectionOverlay({ projection }) {
   );
 }
 
-/**
- * One persistent prism for the whole journey. Opening motion, dock, and projector
- * breaks are driven by the scroll loop — no remounts, no competing prisms.
- */
-function JourneyPrism({ prismRef, labelRef }) {
+function JourneyPrism({ prismRef }) {
   return (
-    <div ref={prismRef} className="journey-prism journey-prism--ego" aria-hidden="true">
-      <PrismGlass variant="beams" />
-      <span ref={labelRef} className="journey-prism__label" />
+    <div ref={prismRef} className="journey-prism journey-prism--ego is-spectrum" aria-hidden="true">
+      <PrismGlass variant="projector" />
     </div>
   );
 }
 
-function MusicHub({ projectTo }) {
-  const released = useMemo(() => CHAPTERS.filter((chapter) => chapter.status === 'released'), []);
-  const [currentId, setCurrentId] = useState('ego');
-  const current = CHAPTERS.find((chapter) => chapter.id === currentId) || released[0];
-  const tracks = current.listen.tracks;
-
-  return (
-    <section className="music-hub" id="music" data-theme={current.id} aria-label="Music">
-      <div className="journey-shell music-hub__grid">
-        <div className="music-hub__left">
-          <div className="music-hub__mast">
-            <div>
-              <h2>MUSIC</h2>
-              <p>Four chapters. One self.</p>
-            </div>
-            <div className="music-hub__copy">
-              <p>
-                ASPECTS is a body of work exploring the self as project. Each chapter reveals a different
-                facet: Ego, Love, Reason, Art. The journey is the music.
-              </p>
-              <button type="button" onClick={() => projectTo('ego', 'ego', '01 / EGO')} className="journey-link">
-                About ASPECTS <span aria-hidden="true">-&gt;</span>
-              </button>
-            </div>
-          </div>
-
-          <ul className="music-hub__cards" aria-label="ASPECTS chapters">
-            {CHAPTERS.map((chapter) => (
-              <li key={chapter.id}>
-                <button
-                  type="button"
-                  className={`music-hub__card music-hub__card--${chapter.id} ${current.id === chapter.id ? 'is-current' : ''}`}
-                  onClick={() => {
-                    setCurrentId(chapter.id);
-                    projectTo(chapter.id, chapter.id, `${chapter.number} / ${chapter.title}`);
-                  }}
-                >
-                  <span>{chapter.number}</span>
-                  <strong>{chapter.title}</strong>
-                  <em>{chapter.subhead}</em>
-                  <small>
-                    <PlayIcon />
-                    {chapter.listen.tracks.length} tracks
-                  </small>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <aside className="music-player" aria-label={`${current.title} player`}>
-          <header>
-            <div>
-              <span>Now playing</span>
-              <strong>{current.title}</strong>
-            </div>
-            <p>01 / {String(tracks.length).padStart(2, '0')}</p>
-          </header>
-
-          <div className="music-player__main">
-            <CoverArt chapter={current.id} title={current.title} size="sm" />
-            <div>
-              <h3>{tracks[0].title}</h3>
-              <p>Kaleb Kavuma</p>
-              <div className="music-player__wave" aria-hidden="true">
-                {Array.from({ length: 30 }, (_, index) => (
-                  <span key={index} style={{ '--bar': `${7 + ((index * 7) % 18)}px` }} />
-                ))}
-              </div>
-              <div className="music-player__controls">
-                <button type="button" aria-label="Previous track">&lt;</button>
-                <button type="button" className="music-player__pause" aria-label="Pause">II</button>
-                <button type="button" aria-label="Next track">&gt;</button>
-              </div>
-            </div>
-          </div>
-
-          <ol className="music-player__tracks">
-            {tracks.map((track, index) => (
-              <li key={track.n}>
-                <button type="button">
-                  <span>{track.n}</span>
-                  <strong>{track.title}</strong>
-                  <em>{track.time}</em>
-                  {index === 0 && <small aria-hidden="true">▶</small>}
-                </button>
-              </li>
-            ))}
-          </ol>
-          <button type="button" onClick={() => projectTo(current.id, current.id, `${current.number} / ${current.title}`)} className="journey-link">
-            View full chapter <span aria-hidden="true">-&gt;</span>
-          </button>
-        </aside>
-      </div>
-
-      <div className="journey-shell music-hub__base">
-        <div>
-          <p className="journey-eyebrow">Listen everywhere</p>
-          <span>Spotify</span>
-          <span>Apple Music</span>
-          <span>Bandcamp</span>
-          <span>YouTube</span>
-        </div>
-        <div className="music-hub__bandcamp">
-          <strong>Support directly on Bandcamp</strong>
-          <p>Higher quality audio. Direct support. Every purchase fuels the work.</p>
-        </div>
-        <EmailCapture heading="Stay in the loop" body="New music, visuals, and reflections." tone="light" compact />
-      </div>
-    </section>
-  );
-}
-
-function ProjectorBreak({ id, theme, dark = false }) {
-  const progressRef = useScrollProgress('--project-p');
+/** Empty scroll runway: prism docks left, white light feeds in, theme color arms. */
+function ChapterPassage({ id, theme }) {
+  const progressRef = useScrollProgress('--passage-p');
 
   return (
     <section
       ref={progressRef}
-      className={`projector-break projector-break--${theme} ${dark ? 'projector-break--dark' : ''}`}
-      data-projector-theme={theme}
-      data-projector-label={id}
+      id={id}
+      className={`chapter-passage chapter-passage--${theme}`}
+      data-passage-theme={theme}
       aria-hidden="true"
     >
-      <div className="projector-break__stage">
-        <span className="projector-break__curtain" />
-        <div className="projector-break__label">{id}</div>
+      <div className="chapter-passage__stage">
+        <div className="chapter-passage__wash" />
       </div>
     </section>
   );
 }
 
 function EgoChapter({ chapter }) {
+  const progressRef = useScrollProgress('--chapter-p');
+
   return (
-    <section className="chapter-world chapter-world--ego" id="ego" data-theme="ego" aria-label="Ego chapter">
-      <div className="journey-shell ego-layout">
-        <header className="ego-layout__head">
-          <p><span>{chapter.number}</span> / {chapter.title}</p>
-          <h2>{chapter.title}</h2>
-          <em>{chapter.subhead}</em>
-        </header>
-        <MediaFrame scene="ego-mirror" caption="Watch chapter intro" time={chapter.heroTime} className="ego-layout__film" />
-        <TrackPanel chapter={chapter} className="ego-layout__tracks" buttonLabel="Listen to chapter" />
-        <EssayPanel chapter={chapter} className="ego-layout__essay" image="ego" />
-        <div className="ego-layout__email">
-          <EmailCapture heading="Stay in the loop" body="New music, visuals, and essays: straight to your inbox." tone="dark" compact />
+    <section
+      ref={progressRef}
+      className="chapter-projector chapter-projector--ego"
+      id="ego"
+      data-theme="ego"
+      aria-label="Ego chapter"
+    >
+      <div className="chapter-projector__wash" aria-hidden="true" />
+      <div className="chapter-projector__stage">
+        <div className="journey-shell ego-layout">
+          <header className="ego-layout__head">
+            <p><span>{chapter.number}</span> / {chapter.title}</p>
+            <h2>{chapter.title}</h2>
+            <em>{chapter.subhead}</em>
+          </header>
+          <div className="ego-layout__content">
+            <MediaFrame scene="ego-mirror" caption={chapter.heroCaption} time={chapter.heroTime} className="ego-layout__film" />
+            <TrackPanel chapter={chapter} className="ego-layout__tracks" buttonLabel="Listen to chapter" />
+            <EssayPanel chapter={chapter} className="ego-layout__essay" image="ego" eyebrow="The essay" />
+            <div className="ego-layout__email">
+              <EmailCapture heading="Stay in the loop" body="New music, visuals, and essays: straight to your inbox." tone="dark" compact />
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -235,63 +138,37 @@ function EgoChapter({ chapter }) {
 }
 
 function LoveChapter({ chapter }) {
-  return (
-    <section className="chapter-world chapter-world--love" id="love" data-theme="love" aria-label="Love chapter">
-      <div className="journey-shell love-layout">
-        <header className="love-layout__head">
-          <p><span>{chapter.number}</span> / {chapter.title}</p>
-          <h2>{chapter.title}</h2>
-          <em>{chapter.subhead}</em>
-          <strong>{chapter.blurb}</strong>
-        </header>
-        <MediaFrame scene="love-lake" caption="Watch film still" className="love-layout__film" />
-        <TrackPanel chapter={chapter} className="love-layout__tracks" compact />
-        <div className="love-layout__portrait" aria-hidden="true" />
-        <EssayPanel chapter={chapter} className="love-layout__essay" />
-        <div className="love-layout__email">
-          <EmailCapture heading="Stay close." body="New music, visuals, and reflections." cta="Join the list" tone="sand" />
-        </div>
-      </div>
-    </section>
-  );
-}
+  const progressRef = useScrollProgress('--chapter-p');
 
-function ReasonChapter({ chapter }) {
   return (
-    <section className="chapter-world chapter-world--reason" id="reason" data-theme="reason" aria-label="Reason chapter">
-      <div className="reason-layout">
-        <div className="reason-layout__left">
-          <header>
+    <section
+      ref={progressRef}
+      className="chapter-projector chapter-projector--love"
+      id="love"
+      data-theme="love"
+      aria-label="Love chapter"
+    >
+      <div className="chapter-projector__wash" aria-hidden="true" />
+      <div className="chapter-projector__stage">
+        <div className="journey-shell love-layout">
+          <header className="love-layout__head">
             <p><span>{chapter.number}</span> / {chapter.title}</p>
             <h2>{chapter.title}</h2>
             <em>{chapter.subhead}</em>
+            <strong>{chapter.blurb}</strong>
           </header>
+          <div className="love-layout__content">
+            <MediaFrame scene="love-lake" caption={chapter.heroCaption} className="love-layout__film" />
+            <TrackPanel chapter={chapter} className="love-layout__tracks" compact buttonLabel="Listen" />
+            <div className="love-layout__portrait" aria-hidden="true">
+              <img src="/media/landing-portrait.png" alt="" draggable="false" />
+            </div>
+            <EssayPanel chapter={chapter} className="love-layout__essay" eyebrow="Essay" />
+            <div className="love-layout__email">
+              <EmailCapture heading="Stay close." body="New music, visuals, and reflections." cta="Join the list" tone="sand" />
+            </div>
+          </div>
         </div>
-        <div className="reason-layout__right">
-          <MediaFrame scene="reason-archive" caption={chapter.heroCaption} time={chapter.heroTime} className="reason-layout__film" />
-          <TrackPanel chapter={chapter} className="reason-layout__tracks" />
-          <EssayPanel chapter={chapter} className="reason-layout__essay" image="reason" />
-          <EmailCapture heading="Stay connected" body="New music, visuals, and essays. Straight to your inbox." tone="dark" compact />
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function ArtChapter({ chapter }) {
-  return (
-    <section className="chapter-world chapter-world--art" id="art" data-theme="art" aria-label="Art chapter">
-      <div className="journey-shell art-layout">
-        <header className="art-layout__head">
-          <p><span>{chapter.number}</span> / {chapter.title}</p>
-          <h2>{chapter.title}</h2>
-          <em>{chapter.subhead}</em>
-          <strong>{chapter.blurb}</strong>
-        </header>
-        <MediaFrame scene="art-collage" caption={chapter.heroCaption} className="art-layout__film" />
-        <TrackPanel chapter={chapter} className="art-layout__tracks" buttonLabel="Play album" />
-        <EssayPanel chapter={chapter} className="art-layout__essay" image="art" />
-        <EmailCapture heading="Join the journey" body="New works, process notes, and early releases. Straight to your inbox." tone="dark" />
       </div>
     </section>
   );
@@ -312,17 +189,17 @@ function TrackPanel({ chapter, className = '', buttonLabel = 'View full project'
           </li>
         ))}
       </ol>
-      <button type="button" className="journey-link">
+      <button type="button" className="journey-link journey-link--button">
         {buttonLabel} <span aria-hidden="true">-&gt;</span>
       </button>
     </section>
   );
 }
 
-function EssayPanel({ chapter, className = '', image }) {
+function EssayPanel({ chapter, className = '', image, eyebrow = 'Essay' }) {
   return (
     <article className={`essay-panel ${image ? `essay-panel--${image}` : ''} ${className}`}>
-      <p className="journey-eyebrow">Essay</p>
+      <p className="journey-eyebrow">{eyebrow}</p>
       <h3>{chapter.essay.title}</h3>
       <p>{chapter.essay.dek}</p>
       <button type="button" className="journey-link">
@@ -332,52 +209,11 @@ function EssayPanel({ chapter, className = '', image }) {
   );
 }
 
-function FilmSection() {
-  return (
-    <section className="film-world" id="film" data-theme="film" aria-label="Film">
-      <div className="journey-shell film-world__grid">
-        <header className="film-world__head">
-          <p><span>09</span> / FILM</p>
-          <h2>FILM</h2>
-          <em>Stories. Realities. Human truths.</em>
-          <strong>ASPECTS is a documentary series that explores the many dimensions of being human. Five films. Five lenses. One journey.</strong>
-          <div>
-            <button type="button" className="film-world__primary"><PlayIcon /> Watch trailer</button>
-            <button type="button" className="film-world__secondary">Full film soon</button>
-          </div>
-        </header>
-        <MediaFrame scene="london-street" caption="Patience Please - Official Trailer" time="02:31" className="film-world__trailer" />
-        <div className="film-world__chapters">
-          <p className="journey-eyebrow">The ASPECTS chapters</p>
-          <ul>
-            {FILM_CHAPTERS.map((chapter) => (
-              <li key={chapter.id} className={`film-world__card film-world__card--${chapter.id}`}>
-                {chapter.id !== 'soon' && <MediaFrame scene={FEATURE_SCENES[chapter.id]} playable={false} />}
-                <span>{chapter.num}</span>
-                <strong>{chapter.title}</strong>
-                <em>{chapter.dek}</em>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="film-world__email">
-          <EmailCapture heading="Join the journey" body="Be the first to know when the full film and chapters are released." cta="Get updates" tone="dark" compact />
-          <div className="film-world__links">
-            <a href="https://youtube.com" target="_blank" rel="noreferrer">YouTube</a>
-            <a href="https://bandcamp.com" target="_blank" rel="noreferrer">Bandcamp</a>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 export default function Journey() {
-  const [ego, love, reason, art] = CHAPTERS;
+  const [ego, love] = PHASE_ONE_CHAPTERS;
   const [projection, setProjection] = useState(null);
   const rootRef = useRef(null);
   const prismRef = useRef(null);
-  const labelRef = useRef(null);
 
   const projectTo = (id, theme, label) => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -396,42 +232,17 @@ export default function Journey() {
     if (!root || !prism) return undefined;
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const clamp01 = (value) => Math.min(1, Math.max(0, value));
+    const clamp01 = (v) => Math.min(1, Math.max(0, v));
     const lerp = (a, b, t) => a + (b - a) * t;
     const easeOut = (t) => 1 - (1 - t) ** 3;
 
-    const measureOpeningProgress = (opening) => {
-      if (!opening) return 1;
-      const span = opening.offsetHeight - window.innerHeight;
-      if (span <= 0) return 1;
-      return clamp01((window.scrollY - opening.offsetTop) / span);
-    };
-
-    const measureZoneProgress = (element, scrollCenter) => {
-      if (!element) return 0;
-      const start = element.offsetTop;
-      const end = start + element.offsetHeight;
-      if (scrollCenter < start || scrollCenter >= end) return scrollCenter >= end ? 1 : 0;
-      return clamp01((scrollCenter - start) / Math.max(end - start, 1));
-    };
-
-    const resolveTheme = (scrollCenter, music, activeBreak) => {
-      if (activeBreak?.dataset.projectorTheme) return activeBreak.dataset.projectorTheme;
-      if (music) {
-        const musicStart = music.offsetTop;
-        const musicEnd = musicStart + music.offsetHeight;
-        if (scrollCenter >= musicStart && scrollCenter < musicEnd) {
-          return music.dataset.theme || 'ego';
-        }
-      }
-      for (const theme of CHAPTER_THEMES) {
-        const section = root.querySelector(`#${theme}`);
-        if (!section) continue;
-        const start = section.offsetTop;
-        const end = start + section.offsetHeight;
-        if (scrollCenter >= start && scrollCenter < end) return theme;
-      }
-      return 'ego';
+    const scrollSpan = (el) => {
+      if (!el) return { p: 1, start: 0 };
+      const vh = window.innerHeight;
+      const start = el.offsetTop;
+      const span = el.offsetHeight - vh;
+      const p = span > 0 ? clamp01((window.scrollY - start) / span) : 1;
+      return { p, start };
     };
 
     let raf = 0;
@@ -439,123 +250,124 @@ export default function Journey() {
       raf = 0;
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      const scrollCenter = window.scrollY + vh * 0.5;
+      const scrollY = window.scrollY;
       const mobile = vw <= 720;
 
       const opening = root.querySelector('.opening-scene');
-      const music = root.querySelector('#music');
-      const breaks = Array.from(root.querySelectorAll('.projector-break'));
+      const egoPassage = root.querySelector('#ego-passage');
+      const ego = root.querySelector('#ego');
+      const lovePassage = root.querySelector('#love-passage');
+      const love = root.querySelector('#love');
 
-      const openingP = measureOpeningProgress(opening);
+      const openingP = scrollSpan(opening).p;
       const projectorP = clamp01((openingP - 0.34) / 0.46);
       const beamP = clamp01((openingP - 0.68) / 0.2);
       const colorBeamP = clamp01((openingP - 0.76) / 0.2);
 
-      const activeBreak = breaks.find((section) => {
-        const rect = section.getBoundingClientRect();
-        return rect.top < vh * 0.68 && rect.bottom > vh * 0.24;
-      });
+      const egoPassageP = scrollSpan(egoPassage).p;
+      const egoP = scrollSpan(ego).p;
+      const lovePassageP = scrollSpan(lovePassage).p;
+      const loveP = scrollSpan(love).p;
 
-      const dockMargin = mobile ? 6 : 10;
-      const dockW = mobile
-        ? Math.min(Math.max(vw * 0.28, 92), 128)
-        : Math.min(Math.max(vw * 0.12, 112), 178);
-      const dockX = dockW * 0.42 + dockMargin;
-      const dockY = vh * 0.5;
+      const openingEnd = opening ? opening.offsetTop + opening.offsetHeight : 0;
+      const egoStart = ego?.offsetTop ?? Infinity;
+      const loveStart = love?.offsetTop ?? Infinity;
 
-      const projectW = mobile
-        ? Math.min(Math.max(vw * 0.28, 126), 176)
-        : Math.min(Math.max(vw * 0.17, 180), 330);
-      const projectX = (mobile ? 16 : Math.min(Math.max(vw * 0.04, 18), 64)) + projectW / 2;
+      let zone = 'opening';
+      if (scrollY >= loveStart) zone = 'love';
+      else if (scrollY >= (lovePassage?.offsetTop ?? Infinity)) zone = 'love-passage';
+      else if (scrollY >= egoStart) zone = 'ego';
+      else if (scrollY >= (egoPassage?.offsetTop ?? Infinity)) zone = 'ego-passage';
+      else if (scrollY >= openingEnd - vh * 0.5) zone = 'exit-opening';
 
-      const openingEndX = vw * 0.5;
-      const openingEndY = vh * (mobile ? 0.54 : 0.52) + vh * (mobile ? 0.06 : 0.08) - vh * 0.14;
-      const openingEndW = mobile
-        ? Math.min(Math.max(vw * 0.43, 230), 230)
-        : Math.min(Math.max(vw * 0.25, 150), 410);
-
-      let x = openingEndX;
-      let y = openingEndY;
-      let w = openingEndW;
+      let x = vw * 0.5;
+      let y = vh * 0.52;
+      let w = mobile ? 120 : 180;
+      let incoming = 0;
+      let emit = 0;
       let whiteBeam = 0;
       let spectrumBeam = 0;
-      let halo = 0.5;
-      let projecting = false;
-      let labelText = '';
-      let mode = 'docked';
+      let emitColor = EMIT_COLORS.ego;
+      let theme = 'ego';
+      let useSpectrum = true;
 
-      const inOpening = openingP < 0.995 && projectorP < 1.001;
-
-      if (inOpening && !reduceMotion) {
+      if (zone === 'opening' && !reduceMotion) {
         const travel = mobile ? 0.33 : 0.35;
         x = vw * 0.5 - vw * travel * (1 - projectorP);
-        y = vh * (mobile ? 0.54 : 0.52) + vh * (mobile ? 0.08 : 0.10) * (1 - projectorP) - vh * (mobile ? 0.11 : 0.14) * projectorP;
+        y = vh * 0.52 + vh * 0.10 * (1 - projectorP) - vh * 0.14 * projectorP;
         w = mobile
           ? Math.min(Math.max(vw * 0.17 + projectorP * vw * 0.26, 86), 230)
           : Math.min(Math.max(vw * 0.11 + projectorP * vw * 0.14, 150), 410);
         whiteBeam = beamP;
         spectrumBeam = colorBeamP * 0.88;
-        halo = 0.38 + projectorP * 0.34;
-        mode = 'opening';
-      } else if (activeBreak && !reduceMotion) {
-        x = projectX;
-        y = vh * 0.5;
-        w = projectW;
-        whiteBeam = 0.88;
-        spectrumBeam = 0.82;
-        halo = 0.72;
-        projecting = true;
-        labelText = activeBreak.dataset.projectorLabel || '';
-        mode = 'projecting';
-      } else {
-        let handoffT = easeOut(clamp01((openingP - 0.9) / 0.1));
-        if (music && scrollCenter >= music.offsetTop) {
-          const musicEntry = clamp01((scrollCenter - music.offsetTop) / Math.max(music.offsetHeight * 0.14, 1));
-          handoffT = Math.max(handoffT, easeOut(musicEntry));
-        }
-        x = lerp(openingEndX, dockX, handoffT);
-        y = lerp(openingEndY, dockY, handoffT);
-        w = lerp(openingEndW, dockW, handoffT);
-        halo = 0.42;
-
-        if (music) {
-          const musicP = measureZoneProgress(music, scrollCenter);
-          const inMusic = scrollCenter >= music.offsetTop && scrollCenter < music.offsetTop + music.offsetHeight;
-          if (inMusic) {
-            mode = 'music';
-            if (musicP <= 0.6) {
-              spectrumBeam = 0.42;
-            } else {
-              const fade = (musicP - 0.6) / 0.4;
-              spectrumBeam = lerp(0.42, 0, fade);
-              whiteBeam = lerp(0, 0.24, fade);
-            }
-          }
-        }
+        useSpectrum = true;
+      } else if (zone === 'exit-opening' && !reduceMotion) {
+        const t = easeOut(clamp01((scrollY - (openingEnd - vh)) / (vh * 0.8)));
+        x = lerp(vw * 0.5, vw * 0.08, t);
+        y = lerp(vh * 0.48, vh * 0.5, t);
+        w = lerp(mobile ? 200 : 280, mobile ? 100 : 130, t);
+        incoming = t * 0.85;
+        whiteBeam = lerp(colorBeamP * 0.5, 0, t);
+        spectrumBeam = lerp(0.4, 0, t);
+        useSpectrum = spectrumBeam > 0.05;
+      } else if (zone === 'ego-passage' && !reduceMotion) {
+        const t = easeOut(egoPassageP);
+        x = vw * (mobile ? 0.09 : 0.07);
+        y = vh * 0.46;
+        w = mobile ? 108 : 138;
+        incoming = lerp(0.9, 0.15, t);
+        emit = lerp(0, 0.55, t);
+        emitColor = EMIT_COLORS.ego;
+        theme = 'ego';
+        useSpectrum = false;
+      } else if (zone === 'ego' && !reduceMotion) {
+        const revealP = clamp01(egoP / 0.42);
+        const contentP = clamp01((egoP - 0.34) / 0.45);
+        x = vw * (mobile ? 0.08 : 0.06);
+        y = lerp(vh * 0.46, vh * 0.28, easeOut(revealP));
+        w = lerp(mobile ? 108 : 138, mobile ? 150 : 198, easeOut(revealP));
+        incoming = lerp(0.12, 0, revealP);
+        emit = lerp(0.55, 0.92, easeOut(revealP)) * (1 - contentP * 0.08);
+        emitColor = EMIT_COLORS.ego;
+        theme = 'ego';
+        useSpectrum = false;
+      } else if (zone === 'love-passage' && !reduceMotion) {
+        const t = easeOut(lovePassageP);
+        x = vw * (mobile ? 0.1 : 0.08);
+        y = vh * 0.42;
+        w = mobile ? 118 : 158;
+        incoming = lerp(0.75, 0.1, t);
+        emit = lerp(0, 0.5, t);
+        emitColor = EMIT_COLORS.love;
+        theme = 'love';
+        useSpectrum = false;
+      } else if (zone === 'love' && !reduceMotion) {
+        const revealP = clamp01(loveP / 0.4);
+        const contentP = clamp01((loveP - 0.32) / 0.45);
+        x = vw * (mobile ? 0.09 : 0.07);
+        y = lerp(vh * 0.42, vh * 0.34, easeOut(revealP));
+        w = lerp(mobile ? 118 : 158, mobile ? 168 : 228, easeOut(revealP));
+        incoming = lerp(0.1, 0, revealP);
+        emit = lerp(0.5, 0.9, easeOut(revealP)) * (1 - contentP * 0.06);
+        emitColor = EMIT_COLORS.love;
+        theme = 'love';
+        useSpectrum = false;
       }
-
-      const theme = resolveTheme(scrollCenter, music, activeBreak);
 
       prism.style.setProperty('--prism-x', `${x.toFixed(2)}px`);
       prism.style.setProperty('--prism-y', `${y.toFixed(2)}px`);
       prism.style.setProperty('--prism-w', `${w.toFixed(2)}px`);
+      prism.style.setProperty('--incoming-opacity', incoming.toFixed(4));
+      prism.style.setProperty('--emit-opacity', emit.toFixed(4));
+      prism.style.setProperty('--emit-color', emitColor);
       prism.style.setProperty('--white-beam', whiteBeam.toFixed(4));
       prism.style.setProperty('--spectrum-beam', spectrumBeam.toFixed(4));
-      prism.style.setProperty('--halo-opacity', halo.toFixed(4));
 
-      prism.classList.toggle('is-opening', mode === 'opening');
-      prism.classList.toggle('is-docked', mode === 'docked' || mode === 'music');
-      prism.classList.toggle('is-projecting', projecting);
-
-      for (const entry of CHAPTER_THEMES) {
-        prism.classList.toggle(`journey-prism--${entry}`, theme === entry);
-      }
-
-      const label = labelRef.current;
-      if (label) {
-        label.textContent = labelText;
-        label.style.opacity = projecting ? '0.78' : '0';
-      }
+      prism.classList.toggle('is-spectrum', useSpectrum);
+      prism.classList.toggle('is-emitting', emit > 0.04);
+      prism.classList.toggle('is-opening', zone === 'opening');
+      prism.classList.toggle('journey-prism--ego', theme === 'ego');
+      prism.classList.toggle('journey-prism--love', theme === 'love');
     };
 
     const schedule = () => {
@@ -575,19 +387,12 @@ export default function Journey() {
   return (
     <div className="journey" ref={rootRef}>
       <ProjectionOverlay projection={projection} />
-      <JourneyPrism prismRef={prismRef} labelRef={labelRef} />
-      <OpeningScene />
-      <MusicHub projectTo={projectTo} />
-      <ProjectorBreak id="01 / EGO" theme="ego" />
+      <JourneyPrism prismRef={prismRef} />
+      <OpeningScene projectTo={projectTo} />
+      <ChapterPassage id="ego-passage" theme="ego" />
       <EgoChapter chapter={ego} />
-      <ProjectorBreak id="02 / LOVE" theme="love" />
+      <ChapterPassage id="love-passage" theme="love" />
       <LoveChapter chapter={love} />
-      <ProjectorBreak id="03 / REASON" theme="reason" dark />
-      <ReasonChapter chapter={reason} />
-      <ProjectorBreak id="04 / ART" theme="art" dark />
-      <ArtChapter chapter={art} />
-      <ProjectorBreak id="09 / FILM" theme="film" dark />
-      <FilmSection />
     </div>
   );
 }
