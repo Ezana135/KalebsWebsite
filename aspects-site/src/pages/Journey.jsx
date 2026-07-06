@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { CHAPTERS } from '../data/chapters';
 import CoverArt from '../components/CoverArt';
 import EmailCapture from '../components/EmailCapture';
@@ -22,6 +22,8 @@ const FILM_CHAPTERS = [
   { id: 'soon', num: '05', title: 'COMING SOON', dek: 'The final chapter. Coming soon.' },
 ];
 
+const CHAPTER_THEMES = ['ego', 'love', 'reason', 'art', 'film'];
+
 function PlayIcon() {
   return (
     <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
@@ -34,33 +36,49 @@ function scrollToSection(id) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function Hero() {
+function OpeningScene() {
+  const progressRef = useScrollProgress('--opening-p');
+
   return (
-    <section className="journey-hero" id="hero" aria-label="ASPECTS">
-      <div className="journey-hero__word" aria-hidden="true">
-        <span className="journey-hero__a" />
-        <span className="journey-hero__spect">SPECTS</span>
-      </div>
-      <h1 className="visually-hidden">ASPECTS by Kaleb Kavuma</h1>
-      <div className="journey-hero__portrait" aria-hidden="true">
-        <img src="/media/landing-portrait.png" alt="" draggable="false" />
+    <section ref={progressRef} className="opening-scene" id="hero" aria-label="ASPECTS">
+      <div className="opening-scene__stage">
+        <div className="opening-scene__word" aria-hidden="true">
+          <span className="opening-scene__aspect-word">ASPECTS</span>
+        </div>
+
+        <h1 className="visually-hidden">ASPECTS by Kaleb Kavuma</h1>
+
+        <div className="opening-scene__portrait" aria-hidden="true">
+          <img src="/media/landing-portrait.png" alt="" draggable="false" />
+        </div>
+
+        <div className="opening-scene__ghost" aria-hidden="true">ASPECTS</div>
       </div>
     </section>
   );
 }
 
-function PrismTransition() {
-  const progressRef = useScrollProgress('--prism-p');
-
+function ProjectionOverlay({ projection }) {
   return (
-    <section ref={progressRef} className="prism-transition" id="prism" aria-label="The prism projector">
-      <div className="prism-transition__stage">
-        <div className="prism-transition__ghost" aria-hidden="true">ASPECTS</div>
-        <div className="prism-transition__object" aria-hidden="true">
-          <PrismGlass variant="beams" />
-        </div>
-      </div>
-    </section>
+    <div
+      className={`projection-overlay ${projection ? 'is-running' : ''} projection-overlay--${projection?.theme || 'ego'}`}
+      aria-hidden="true"
+    >
+      <span className="projection-overlay__label">{projection?.label}</span>
+    </div>
+  );
+}
+
+/**
+ * One persistent prism for the whole journey. Opening motion, dock, and projector
+ * breaks are driven by the scroll loop — no remounts, no competing prisms.
+ */
+function JourneyPrism({ prismRef, labelRef }) {
+  return (
+    <div ref={prismRef} className="journey-prism journey-prism--ego" aria-hidden="true">
+      <PrismGlass variant="beams" />
+      <span ref={labelRef} className="journey-prism__label" />
+    </div>
   );
 }
 
@@ -184,6 +202,8 @@ function ProjectorBreak({ id, theme, dark = false }) {
     <section
       ref={progressRef}
       className={`projector-break projector-break--${theme} ${dark ? 'projector-break--dark' : ''}`}
+      data-projector-theme={theme}
+      data-projector-label={id}
       aria-hidden="true"
     >
       <div className="projector-break__stage">
@@ -314,7 +334,7 @@ function EssayPanel({ chapter, className = '', image }) {
 
 function FilmSection() {
   return (
-    <section className="film-world" id="film" aria-label="Film">
+    <section className="film-world" id="film" data-theme="film" aria-label="Film">
       <div className="journey-shell film-world__grid">
         <header className="film-world__head">
           <p><span>09</span> / FILM</p>
@@ -354,15 +374,209 @@ function FilmSection() {
 
 export default function Journey() {
   const [ego, love, reason, art] = CHAPTERS;
+  const [projection, setProjection] = useState(null);
+  const rootRef = useRef(null);
+  const prismRef = useRef(null);
+  const labelRef = useRef(null);
 
-  const projectTo = (id) => {
-    scrollToSection(id);
+  const projectTo = (id, theme, label) => {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion || !theme) {
+      scrollToSection(id);
+      return;
+    }
+    setProjection({ theme, label });
+    window.setTimeout(() => scrollToSection(id), 180);
+    window.setTimeout(() => setProjection(null), 1050);
   };
 
+  useEffect(() => {
+    const root = rootRef.current;
+    const prism = prismRef.current;
+    if (!root || !prism) return undefined;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const clamp01 = (value) => Math.min(1, Math.max(0, value));
+    const lerp = (a, b, t) => a + (b - a) * t;
+    const easeOut = (t) => 1 - (1 - t) ** 3;
+
+    const measureOpeningProgress = (opening) => {
+      if (!opening) return 1;
+      const span = opening.offsetHeight - window.innerHeight;
+      if (span <= 0) return 1;
+      return clamp01((window.scrollY - opening.offsetTop) / span);
+    };
+
+    const measureZoneProgress = (element, scrollCenter) => {
+      if (!element) return 0;
+      const start = element.offsetTop;
+      const end = start + element.offsetHeight;
+      if (scrollCenter < start || scrollCenter >= end) return scrollCenter >= end ? 1 : 0;
+      return clamp01((scrollCenter - start) / Math.max(end - start, 1));
+    };
+
+    const resolveTheme = (scrollCenter, music, activeBreak) => {
+      if (activeBreak?.dataset.projectorTheme) return activeBreak.dataset.projectorTheme;
+      if (music) {
+        const musicStart = music.offsetTop;
+        const musicEnd = musicStart + music.offsetHeight;
+        if (scrollCenter >= musicStart && scrollCenter < musicEnd) {
+          return music.dataset.theme || 'ego';
+        }
+      }
+      for (const theme of CHAPTER_THEMES) {
+        const section = root.querySelector(`#${theme}`);
+        if (!section) continue;
+        const start = section.offsetTop;
+        const end = start + section.offsetHeight;
+        if (scrollCenter >= start && scrollCenter < end) return theme;
+      }
+      return 'ego';
+    };
+
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const scrollCenter = window.scrollY + vh * 0.5;
+      const mobile = vw <= 720;
+
+      const opening = root.querySelector('.opening-scene');
+      const music = root.querySelector('#music');
+      const breaks = Array.from(root.querySelectorAll('.projector-break'));
+
+      const openingP = measureOpeningProgress(opening);
+      const projectorP = clamp01((openingP - 0.34) / 0.46);
+      const beamP = clamp01((openingP - 0.68) / 0.2);
+      const colorBeamP = clamp01((openingP - 0.76) / 0.2);
+
+      const activeBreak = breaks.find((section) => {
+        const rect = section.getBoundingClientRect();
+        return rect.top < vh * 0.68 && rect.bottom > vh * 0.24;
+      });
+
+      const dockMargin = mobile ? 6 : 10;
+      const dockW = mobile
+        ? Math.min(Math.max(vw * 0.28, 92), 128)
+        : Math.min(Math.max(vw * 0.12, 112), 178);
+      const dockX = dockW * 0.42 + dockMargin;
+      const dockY = vh * 0.5;
+
+      const projectW = mobile
+        ? Math.min(Math.max(vw * 0.28, 126), 176)
+        : Math.min(Math.max(vw * 0.17, 180), 330);
+      const projectX = (mobile ? 16 : Math.min(Math.max(vw * 0.04, 18), 64)) + projectW / 2;
+
+      const openingEndX = vw * 0.5;
+      const openingEndY = vh * (mobile ? 0.54 : 0.52) + vh * (mobile ? 0.06 : 0.08) - vh * 0.14;
+      const openingEndW = mobile
+        ? Math.min(Math.max(vw * 0.43, 230), 230)
+        : Math.min(Math.max(vw * 0.25, 150), 410);
+
+      let x = openingEndX;
+      let y = openingEndY;
+      let w = openingEndW;
+      let whiteBeam = 0;
+      let spectrumBeam = 0;
+      let halo = 0.5;
+      let projecting = false;
+      let labelText = '';
+      let mode = 'docked';
+
+      const inOpening = openingP < 0.995 && projectorP < 1.001;
+
+      if (inOpening && !reduceMotion) {
+        const travel = mobile ? 0.33 : 0.35;
+        x = vw * 0.5 - vw * travel * (1 - projectorP);
+        y = vh * (mobile ? 0.54 : 0.52) + vh * (mobile ? 0.08 : 0.10) * (1 - projectorP) - vh * (mobile ? 0.11 : 0.14) * projectorP;
+        w = mobile
+          ? Math.min(Math.max(vw * 0.17 + projectorP * vw * 0.26, 86), 230)
+          : Math.min(Math.max(vw * 0.11 + projectorP * vw * 0.14, 150), 410);
+        whiteBeam = beamP;
+        spectrumBeam = colorBeamP * 0.88;
+        halo = 0.38 + projectorP * 0.34;
+        mode = 'opening';
+      } else if (activeBreak && !reduceMotion) {
+        x = projectX;
+        y = vh * 0.5;
+        w = projectW;
+        whiteBeam = 0.88;
+        spectrumBeam = 0.82;
+        halo = 0.72;
+        projecting = true;
+        labelText = activeBreak.dataset.projectorLabel || '';
+        mode = 'projecting';
+      } else {
+        let handoffT = easeOut(clamp01((openingP - 0.9) / 0.1));
+        if (music && scrollCenter >= music.offsetTop) {
+          const musicEntry = clamp01((scrollCenter - music.offsetTop) / Math.max(music.offsetHeight * 0.14, 1));
+          handoffT = Math.max(handoffT, easeOut(musicEntry));
+        }
+        x = lerp(openingEndX, dockX, handoffT);
+        y = lerp(openingEndY, dockY, handoffT);
+        w = lerp(openingEndW, dockW, handoffT);
+        halo = 0.42;
+
+        if (music) {
+          const musicP = measureZoneProgress(music, scrollCenter);
+          const inMusic = scrollCenter >= music.offsetTop && scrollCenter < music.offsetTop + music.offsetHeight;
+          if (inMusic) {
+            mode = 'music';
+            if (musicP <= 0.6) {
+              spectrumBeam = 0.42;
+            } else {
+              const fade = (musicP - 0.6) / 0.4;
+              spectrumBeam = lerp(0.42, 0, fade);
+              whiteBeam = lerp(0, 0.24, fade);
+            }
+          }
+        }
+      }
+
+      const theme = resolveTheme(scrollCenter, music, activeBreak);
+
+      prism.style.setProperty('--prism-x', `${x.toFixed(2)}px`);
+      prism.style.setProperty('--prism-y', `${y.toFixed(2)}px`);
+      prism.style.setProperty('--prism-w', `${w.toFixed(2)}px`);
+      prism.style.setProperty('--white-beam', whiteBeam.toFixed(4));
+      prism.style.setProperty('--spectrum-beam', spectrumBeam.toFixed(4));
+      prism.style.setProperty('--halo-opacity', halo.toFixed(4));
+
+      prism.classList.toggle('is-opening', mode === 'opening');
+      prism.classList.toggle('is-docked', mode === 'docked' || mode === 'music');
+      prism.classList.toggle('is-projecting', projecting);
+
+      for (const entry of CHAPTER_THEMES) {
+        prism.classList.toggle(`journey-prism--${entry}`, theme === entry);
+      }
+
+      const label = labelRef.current;
+      if (label) {
+        label.textContent = labelText;
+        label.style.opacity = projecting ? '0.78' : '0';
+      }
+    };
+
+    const schedule = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    return () => {
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
   return (
-    <div className="journey">
-      <Hero />
-      <PrismTransition />
+    <div className="journey" ref={rootRef}>
+      <ProjectionOverlay projection={projection} />
+      <JourneyPrism prismRef={prismRef} labelRef={labelRef} />
+      <OpeningScene />
       <MusicHub projectTo={projectTo} />
       <ProjectorBreak id="01 / EGO" theme="ego" />
       <EgoChapter chapter={ego} />

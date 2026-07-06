@@ -1,6 +1,6 @@
 import './prism-glass.css';
 
-const PRISM_SRC = '/media/aspects-prism-logo.png';
+const PRISM_SRC = '/media/aspects-prism-logo-tight.png';
 
 /**
  * Image-backed ASPECTS prism. The supplied logo render is the source of truth;
