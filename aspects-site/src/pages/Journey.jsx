@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { CHAPTERS } from '../data/chapters';
 import CoverArt from '../components/CoverArt';
 import EmailCapture from '../components/EmailCapture';
@@ -34,11 +34,54 @@ function scrollToSection(id) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function Hero() {
+// The chapter light each phase makes the travelling prism emit,
+// and the projector label shown beside it once it docks.
+const PRISM_TINTS = {
+  ego: 'var(--ego-beam)',
+  love: 'var(--love-beam)',
+  reason: 'var(--reason-beam)',
+  art: 'var(--art-beam)',
+  film: 'var(--film-beam)',
+};
+
+const PRISM_LABELS = {
+  ego: '01 / EGO',
+  love: '02 / LOVE',
+  reason: '03 / REASON',
+  art: '04 / ART',
+  film: '09 / FILM',
+};
+
+/**
+ * The single prism that travels the whole journey. It starts as the "A" of
+ * ASPECTS in the hero, glides to centre stage for the refraction transition,
+ * then docks on the left as the projector that lights every chapter.
+ * Position/size come from --prism-x/y/w set by the scroll loop in Journey.
+ */
+function JourneyPrism({ phase, projecting, prismRef }) {
   return (
-    <section className="journey-hero" id="hero" aria-label="ASPECTS">
+    <div
+      ref={prismRef}
+      className={`journey-prism journey-prism--${phase} ${projecting ? 'is-projecting' : ''}`}
+      aria-hidden="true"
+    >
+      {/* key restarts the light animations whenever the prism enters a new phase */}
+      <PrismGlass
+        key={phase}
+        variant="journey"
+        tint={PRISM_TINTS[phase]}
+        emitAngle={phase === 'reason' ? 'down' : 'right'}
+      />
+      {PRISM_LABELS[phase] && <span className="journey-prism__label">{PRISM_LABELS[phase]}</span>}
+    </div>
+  );
+}
+
+function Hero({ anchorRef }) {
+  return (
+    <section className="journey-hero" id="hero" data-journey-phase="hero" aria-label="ASPECTS">
       <div className="journey-hero__word" aria-hidden="true">
-        <span className="journey-hero__a" />
+        <span className="journey-hero__a" ref={anchorRef} />
         <span className="journey-hero__spect">SPECTS</span>
       </div>
       <h1 className="visually-hidden">ASPECTS by Kaleb Kavuma</h1>
@@ -53,14 +96,28 @@ function PrismTransition() {
   const progressRef = useScrollProgress('--prism-p');
 
   return (
-    <section ref={progressRef} className="prism-transition" id="prism" aria-label="The prism projector">
+    <section
+      ref={progressRef}
+      className="prism-transition"
+      id="prism"
+      data-journey-phase="prism"
+      aria-label="The prism projector"
+    >
       <div className="prism-transition__stage">
         <div className="prism-transition__ghost" aria-hidden="true">ASPECTS</div>
-        <div className="prism-transition__object" aria-hidden="true">
-          <PrismGlass variant="beams" />
-        </div>
       </div>
     </section>
+  );
+}
+
+function ProjectionOverlay({ projection }) {
+  return (
+    <div
+      className={`projection-overlay ${projection ? 'is-running' : ''} projection-overlay--${projection?.theme || 'ego'}`}
+      aria-hidden="true"
+    >
+      <span className="projection-overlay__label">{projection?.label}</span>
+    </div>
   );
 }
 
@@ -71,7 +128,7 @@ function MusicHub({ projectTo }) {
   const tracks = current.listen.tracks;
 
   return (
-    <section className="music-hub" id="music" data-theme={current.id} aria-label="Music">
+    <section className="music-hub" id="music" data-journey-phase="music" data-theme={current.id} aria-label="Music">
       <div className="journey-shell music-hub__grid">
         <div className="music-hub__left">
           <div className="music-hub__mast">
@@ -177,18 +234,19 @@ function MusicHub({ projectTo }) {
   );
 }
 
-function ProjectorBreak({ id, theme, dark = false }) {
+function ProjectorBreak({ label, theme, dark = false }) {
   const progressRef = useScrollProgress('--project-p');
 
   return (
     <section
       ref={progressRef}
       className={`projector-break projector-break--${theme} ${dark ? 'projector-break--dark' : ''}`}
+      data-journey-phase={theme}
       aria-hidden="true"
     >
       <div className="projector-break__stage">
         <span className="projector-break__curtain" />
-        <div className="projector-break__label">{id}</div>
+        <div className="projector-break__label">{label}</div>
       </div>
     </section>
   );
@@ -196,7 +254,7 @@ function ProjectorBreak({ id, theme, dark = false }) {
 
 function EgoChapter({ chapter }) {
   return (
-    <section className="chapter-world chapter-world--ego" id="ego" data-theme="ego" aria-label="Ego chapter">
+    <section className="chapter-world chapter-world--ego" id="ego" data-journey-phase="ego" data-theme="ego" aria-label="Ego chapter">
       <div className="journey-shell ego-layout">
         <header className="ego-layout__head">
           <p><span>{chapter.number}</span> / {chapter.title}</p>
@@ -216,7 +274,7 @@ function EgoChapter({ chapter }) {
 
 function LoveChapter({ chapter }) {
   return (
-    <section className="chapter-world chapter-world--love" id="love" data-theme="love" aria-label="Love chapter">
+    <section className="chapter-world chapter-world--love" id="love" data-journey-phase="love" data-theme="love" aria-label="Love chapter">
       <div className="journey-shell love-layout">
         <header className="love-layout__head">
           <p><span>{chapter.number}</span> / {chapter.title}</p>
@@ -238,7 +296,7 @@ function LoveChapter({ chapter }) {
 
 function ReasonChapter({ chapter }) {
   return (
-    <section className="chapter-world chapter-world--reason" id="reason" data-theme="reason" aria-label="Reason chapter">
+    <section className="chapter-world chapter-world--reason" id="reason" data-journey-phase="reason" data-theme="reason" aria-label="Reason chapter">
       <div className="reason-layout">
         <div className="reason-layout__left">
           <header>
@@ -260,7 +318,7 @@ function ReasonChapter({ chapter }) {
 
 function ArtChapter({ chapter }) {
   return (
-    <section className="chapter-world chapter-world--art" id="art" data-theme="art" aria-label="Art chapter">
+    <section className="chapter-world chapter-world--art" id="art" data-journey-phase="art" data-theme="art" aria-label="Art chapter">
       <div className="journey-shell art-layout">
         <header className="art-layout__head">
           <p><span>{chapter.number}</span> / {chapter.title}</p>
@@ -314,7 +372,7 @@ function EssayPanel({ chapter, className = '', image }) {
 
 function FilmSection() {
   return (
-    <section className="film-world" id="film" aria-label="Film">
+    <section className="film-world" id="film" data-journey-phase="film" aria-label="Film">
       <div className="journey-shell film-world__grid">
         <header className="film-world__head">
           <p><span>09</span> / FILM</p>
@@ -354,25 +412,134 @@ function FilmSection() {
 
 export default function Journey() {
   const [ego, love, reason, art] = CHAPTERS;
+  const [projection, setProjection] = useState(null);
+  const [phase, setPhase] = useState('hero');
+  const rootRef = useRef(null);
+  const heroAnchorRef = useRef(null);
+  const prismRef = useRef(null);
 
-  const projectTo = (id) => {
-    scrollToSection(id);
+  const projectTo = (id, theme, label) => {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion || !theme) {
+      scrollToSection(id);
+      return;
+    }
+    setProjection({ theme, label });
+    window.setTimeout(() => scrollToSection(id), 180);
+    window.setTimeout(() => setProjection(null), 1050);
   };
 
+  // Drives the single travelling prism: hero "A" -> centre stage during the
+  // pinned refraction transition -> left projector dock for the chapters.
+  useEffect(() => {
+    const root = rootRef.current;
+    const prism = prismRef.current;
+    const heroAnchor = heroAnchorRef.current;
+    const pinSection = root?.querySelector('#prism');
+    if (!root || !prism || !heroAnchor || !pinSection) return undefined;
+
+    const phaseSections = Array.from(root.querySelectorAll('[data-journey-phase]'));
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const clamp01 = (value) => Math.min(1, Math.max(0, value));
+    const easeOut = (t) => 1 - (1 - t) ** 3;
+    const lerp = (a, b, t) => a + (b - a) * t;
+
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      // The section owning the prism = last one whose top passed viewport centre.
+      let active = 'hero';
+      for (const section of phaseSections) {
+        if (section.getBoundingClientRect().top <= vh * 0.5) active = section.dataset.journeyPhase;
+      }
+      setPhase(active);
+
+      // The three stations the prism travels between (viewport coordinates).
+      const heroRect = heroAnchor.getBoundingClientRect();
+      const hero = {
+        x: heroRect.left + heroRect.width / 2,
+        y: heroRect.top + heroRect.height / 2,
+        w: heroRect.width,
+      };
+      const centre = { x: vw / 2, y: vh / 2, w: Math.min(Math.max(vw * 0.34, 290), 520) };
+      const dockW = vw <= 720 ? Math.min(Math.max(vw * 0.3, 96), 150) : Math.min(Math.max(vw * 0.18, 180), 300);
+      const dock = {
+        x: (vw <= 720 ? 8 : Math.min(Math.max(vw * 0.035, 16), 56)) + dockW / 2,
+        y: vh / 2,
+        w: dockW,
+      };
+
+      const rect = pinSection.getBoundingClientRect();
+      const span = rect.height - vh;
+      const p = span > 0 ? clamp01(-rect.top / span) : 1;
+      // How far the pinned stage has scrolled off the top once the pin ends.
+      const exit = span > 0 ? clamp01((-rect.top - span) / (vh * 0.9)) : 1;
+
+      // Approach: distance the transition section has entered the viewport,
+      // normalised so the prism leaves the hero "A" as the section arrives
+      // and reaches centre stage just past halfway through the pin.
+      const approach = clamp01((vh - rect.top) / (vh + span * 0.55));
+
+      let x;
+      let y;
+      let w;
+      if (reduceMotion) {
+        ({ x, y, w } = rect.top > 0 ? hero : dock);
+      } else if (p < 1) {
+        const t = easeOut(approach); // glued to the "A", then glides to centre
+        x = lerp(hero.x, centre.x, t);
+        y = lerp(hero.y, centre.y, t);
+        w = lerp(hero.w, centre.w, t);
+      } else {
+        const t = easeOut(exit); // hands off from centre stage to the dock
+        x = lerp(centre.x, dock.x, t);
+        y = lerp(centre.y, dock.y, t);
+        w = lerp(centre.w, dock.w, t);
+      }
+
+      prism.style.setProperty('--prism-x', `${x.toFixed(2)}px`);
+      prism.style.setProperty('--prism-y', `${y.toFixed(2)}px`);
+      prism.style.setProperty('--prism-w', `${w.toFixed(2)}px`);
+      prism.style.setProperty('--prism-p', reduceMotion ? '1' : p.toFixed(4));
+    };
+
+    const schedule = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    const ro = new ResizeObserver(schedule);
+    ro.observe(root);
+    return () => {
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+      ro.disconnect();
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
   return (
-    <div className="journey">
-      <Hero />
+    <div className="journey" ref={rootRef}>
+      <ProjectionOverlay projection={projection} />
+      <JourneyPrism phase={phase} projecting={Boolean(projection)} prismRef={prismRef} />
+      <Hero anchorRef={heroAnchorRef} />
       <PrismTransition />
       <MusicHub projectTo={projectTo} />
-      <ProjectorBreak id="01 / EGO" theme="ego" />
+      <ProjectorBreak label="01 / EGO" theme="ego" />
       <EgoChapter chapter={ego} />
-      <ProjectorBreak id="02 / LOVE" theme="love" />
+      <ProjectorBreak label="02 / LOVE" theme="love" />
       <LoveChapter chapter={love} />
-      <ProjectorBreak id="03 / REASON" theme="reason" dark />
+      <ProjectorBreak label="03 / REASON" theme="reason" dark />
       <ReasonChapter chapter={reason} />
-      <ProjectorBreak id="04 / ART" theme="art" dark />
+      <ProjectorBreak label="04 / ART" theme="art" dark />
       <ArtChapter chapter={art} />
-      <ProjectorBreak id="09 / FILM" theme="film" dark />
+      <ProjectorBreak label="09 / FILM" theme="film" dark />
       <FilmSection />
     </div>
   );

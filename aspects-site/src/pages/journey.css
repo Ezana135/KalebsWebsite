@@ -57,8 +57,10 @@
   transform: translateY(5vh);
 }
 
+/* Empty box marking where the travelling prism sits as the "A" of ASPECTS. */
 .journey-hero__a {
   width: clamp(118px, 14vw, 230px);
+  aspect-ratio: 0.72;
   flex: none;
   margin-right: -0.5vw;
   transform: translateY(4%);
@@ -116,21 +118,8 @@
   display: grid;
   place-items: center;
   overflow: hidden;
-}
-
-.prism-transition__stage::before {
-  content: '';
-  position: absolute;
-  left: -8vw;
-  right: 0;
-  top: 46%;
-  height: 12px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.98), transparent 64%);
-  box-shadow: 0 0 30px rgba(255, 255, 255, 0.96);
-  opacity: clamp(0, calc((var(--prism-p) - 0.08) * 4), 1);
-  transform: translateX(calc((1 - var(--prism-p)) * -36vw)) scaleX(calc(0.36 + var(--prism-p) * 0.64));
-  transform-origin: left center;
-  z-index: 0;
+  /* faint vignette so the white light beam reads against the paper */
+  background: radial-gradient(ellipse 70% 55% at 50% 52%, rgba(16, 20, 26, 0.05), transparent 74%);
 }
 
 .prism-transition__ghost {
@@ -147,35 +136,6 @@
   transform: translateY(calc(var(--prism-p) * -8vh)) scale(calc(1 + var(--prism-p) * 0.08));
 }
 
-.prism-transition__object {
-  width: clamp(310px, 35vw, 540px);
-  z-index: 2;
-  transform:
-    translateX(calc((1 - var(--prism-p)) * -22vw))
-    translateY(calc((1 - var(--prism-p)) * 4vh))
-    scale(calc(0.68 + var(--prism-p) * 0.32));
-  transition: filter 0.2s linear;
-}
-
-.prism-transition__object .beam--white {
-  opacity: clamp(0, calc((var(--prism-p) - 0.18) * 5), 1);
-  transform: scaleX(clamp(0.08, calc((var(--prism-p) - 0.12) * 2.4), 1));
-  transform-origin: right center;
-}
-
-.prism-transition__object .beam--gold,
-.prism-transition__object .beam--red,
-.prism-transition__object .beam--blue,
-.prism-transition__object .beam--purple {
-  opacity: clamp(0, calc((var(--prism-p) - 0.32) * 4), 0.94);
-  scale: clamp(0.08, calc((var(--prism-p) - 0.28) * 2.2), 1) 1;
-  transform-origin: left center;
-}
-
-.prism-transition__object .prism-glass__halo {
-  opacity: clamp(0.35, calc(var(--prism-p) * 1.2), 1);
-}
-
 .music-hub {
   padding: 76px 0 60px;
   background: #f7f6f2;
@@ -190,13 +150,9 @@
 
 .music-hub__mast {
   display: grid;
-  grid-template-columns: 128px minmax(250px, auto) minmax(230px, 0.55fr);
+  grid-template-columns: minmax(250px, auto) minmax(230px, 0.55fr);
   gap: 24px;
   align-items: end;
-}
-
-.music-hub__prism {
-  width: 128px;
 }
 
 .music-hub h2 {
@@ -205,7 +161,7 @@
   line-height: 0.78;
 }
 
-.music-hub__mast > div:nth-child(2) p {
+.music-hub__mast > div:first-child p {
   font-family: var(--font-serif);
   font-size: clamp(20px, 2vw, 30px);
   font-style: italic;
@@ -601,57 +557,158 @@
 }
 
 
+/* ---- The single travelling prism ------------------------------------- */
+/* --prism-x/y/w are viewport coordinates set every frame by Journey.jsx;
+   --prism-p is the pinned refraction-transition progress (0 -> 1). */
+
 .journey-prism {
   position: fixed;
+  left: 0;
+  top: 0;
   z-index: 80;
-  left: clamp(18px, 4vw, 64px);
-  top: 50%;
-  width: clamp(180px, 18vw, 320px);
-  transform: translateY(-50%) scale(0.92);
+  width: var(--prism-w, 300px);
+  transform: translate3d(calc(var(--prism-x, 50vw) - 50%), calc(var(--prism-y, 50vh) - 50%), 0);
   pointer-events: none;
-  opacity: 0.96;
-  transition:
-    transform 900ms var(--ease),
-    opacity 900ms var(--ease),
-    filter 900ms var(--ease);
+  /* multiply lets the paper-white interior of the photographed prism
+     disappear into light pages, leaving only the glass and its light */
+  mix-blend-mode: multiply;
+  will-change: transform, width;
 }
 
-.journey-prism.is-projecting {
-  transform: translateY(-50%) scale(1.05);
-  opacity: 1;
+/* dark chapters flip to screen so the prism glows like a projector lens */
+.journey-prism--reason,
+.journey-prism--art,
+.journey-prism--film {
+  mix-blend-mode: screen;
+}
+
+.journey-prism .prism-glass {
+  transition: transform 500ms var(--ease);
+}
+
+.journey-prism.is-projecting .prism-glass {
+  transform: scale(1.06);
 }
 
 .journey-prism__label {
   position: absolute;
-  left: 78%;
-  top: 46%;
+  left: 86%;
+  top: 47%;
   font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.32em;
   text-transform: uppercase;
-  color: var(--off-white);
-  opacity: 0.82;
+  white-space: nowrap;
+  color: #17181c;
+  opacity: 0.8;
   transform: translateY(-50%);
+  animation: journey-label-in 900ms var(--ease) both;
 }
 
-.journey-prism--ego {
-  filter: drop-shadow(0 0 34px rgba(232, 178, 82, 0.36));
+.journey-prism--reason .journey-prism__label,
+.journey-prism--art .journey-prism__label,
+.journey-prism--film .journey-prism__label {
+  color: var(--off-white);
 }
 
-.journey-prism--love {
-  filter: drop-shadow(0 0 34px rgba(112, 182, 255, 0.34));
+@keyframes journey-label-in {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) translateX(-14px);
+  }
+  to {
+    opacity: 0.8;
+    transform: translateY(-50%) translateX(0);
+  }
 }
 
-.journey-prism--reason {
-  filter: drop-shadow(0 0 34px rgba(255, 72, 72, 0.32));
+/* light layers: everything exists on the one prism, phases fade layers in */
+.journey-prism .beam,
+.journey-prism .prism-glass__incoming,
+.journey-prism .prism-glass__emit {
+  opacity: 0;
+  animation: none;
 }
 
-.journey-prism--art {
-  filter: drop-shadow(0 0 34px rgba(178, 122, 255, 0.34));
+/* pinned refraction: white light in, then the spectrum fans out, all
+   scroll-linked through --prism-p */
+.journey-prism--prism .beam--white {
+  opacity: clamp(0, calc((var(--prism-p) - 0.14) * 4.5), 1);
+  scale: clamp(0.08, calc((var(--prism-p) - 0.08) * 2.2), 1) 1;
 }
 
-.journey-prism--film {
-  filter: drop-shadow(0 0 34px rgba(230, 230, 230, 0.28));
+.journey-prism--prism .beam--yellow,
+.journey-prism--prism .beam--red,
+.journey-prism--prism .beam--blue,
+.journey-prism--prism .beam--green {
+  opacity: clamp(0, calc((var(--prism-p) - 0.34) * 4), 0.92);
+  scale: clamp(0.06, calc((var(--prism-p) - 0.3) * 2), 1) 1;
+}
+
+.journey-prism--prism .prism-glass__halo {
+  opacity: clamp(0.35, calc(var(--prism-p) * 1.2), 1);
+}
+
+/* music hub: the prism ghosts back so the shelf stays readable, while the
+   full spectrum lingers softly across the cards */
+.journey-prism--music {
+  opacity: 0.55;
+  transition: opacity 700ms var(--ease);
+}
+
+.journey-prism--music .beam--white {
+  opacity: 0.55;
+}
+
+.journey-prism--music .beam--yellow,
+.journey-prism--music .beam--red,
+.journey-prism--music .beam--blue,
+.journey-prism--music .beam--green {
+  opacity: 0.42;
+  animation: journey-light-in 900ms var(--ease) both;
+}
+
+/* chapters: incoming white light + one chapter-tinted beam projecting out */
+.journey-prism--ego .prism-glass__incoming,
+.journey-prism--love .prism-glass__incoming,
+.journey-prism--reason .prism-glass__incoming,
+.journey-prism--art .prism-glass__incoming,
+.journey-prism--film .prism-glass__incoming {
+  opacity: 1;
+  animation: journey-light-in 900ms var(--ease) both;
+}
+
+.journey-prism--ego .prism-glass__emit,
+.journey-prism--love .prism-glass__emit,
+.journey-prism--reason .prism-glass__emit,
+.journey-prism--art .prism-glass__emit,
+.journey-prism--film .prism-glass__emit {
+  opacity: 0.82;
+  animation:
+    journey-emit-in 1100ms var(--ease) both,
+    emit-shimmer 5s ease-in-out 1.2s infinite;
+}
+
+/* draw-in uses the scale property so Reason's rotate() transform survives */
+@keyframes journey-emit-in {
+  from {
+    opacity: 0;
+    scale: 0.08 1;
+  }
+  to {
+    opacity: 0.82;
+    scale: 1 1;
+  }
+}
+
+@keyframes journey-light-in {
+  from {
+    opacity: 0;
+    scale: 0 1;
+  }
+  to {
+    scale: 1 1;
+  }
 }
 
 .projection-overlay.is-running {
@@ -1391,6 +1448,11 @@
     padding-inline: 18px;
   }
 
+  /* duplicate of the header strapline; overlaps the title on small screens */
+  .reason-layout__left::after {
+    display: none;
+  }
+
   .reason-layout h2,
   .ego-layout__head h2,
   .love-layout__head h2,
@@ -1404,12 +1466,24 @@
     inset: 0;
     border-radius: 0;
   }
+
+  .journey-prism {
+    opacity: 0.88;
+  }
+
+  .journey-prism__label {
+    display: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .projection-overlay,
   .projection-overlay.is-running,
   .projection-overlay.is-running .projection-overlay__label,
+  .journey-prism__label,
+  .journey-prism .prism-glass__incoming,
+  .journey-prism .prism-glass__emit,
+  .journey-prism .beam,
   .music-hub__grid,
   .ego-layout,
   .love-layout,
@@ -1424,40 +1498,3 @@
   }
 }
 
-/* Persistent crystal motion states */
-.journey-prism {
-  left: 9.2vw;
-  top: 50%;
-  width: clamp(170px, 18vw, 310px);
-  transform: translateY(-50%) scale(1);
-}
-
-.journey--hero .journey-prism {
-  left: 8.5vw;
-  top: 52%;
-  width: clamp(180px, 18vw, 320px);
-  transform: translateY(-50%) scale(1);
-}
-
-.journey--prism .journey-prism {
-  left: 50%;
-  top: 50%;
-  width: clamp(220px, 20vw, 360px);
-  transform: translate(-50%, -50%) scale(1.04);
-}
-
-.journey--music .journey-prism,
-.journey--ego .journey-prism,
-.journey--love .journey-prism,
-.journey--reason .journey-prism,
-.journey--art .journey-prism,
-.journey--film .journey-prism {
-  left: clamp(18px, 4vw, 64px);
-  top: 50%;
-  width: clamp(180px, 18vw, 320px);
-  transform: translateY(-50%) scale(1.03);
-}
-
-.journey--hero .journey-prism__label {
-  display: none;
-}
