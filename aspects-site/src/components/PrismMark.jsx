@@ -1,4 +1,4 @@
-const PRISM_SRC = '/media/aspects-prism-logo.png';
+import PrismGlass from './PrismGlass';
 
 export default function PrismMark({ size = 22, className = '' }) {
   return (
@@ -7,7 +7,7 @@ export default function PrismMark({ size = 22, className = '' }) {
       style={{ '--mark-size': `${size}px` }}
       aria-hidden="true"
     >
-      <img src={PRISM_SRC} alt="" draggable="false" />
+      <PrismGlass variant="plain" />
     </span>
   );
 }

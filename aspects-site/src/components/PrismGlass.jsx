@@ -1,9 +1,7 @@
 import './prism-glass.css';
 
-const PRISM_SRC = '/media/aspects-prism-logo-tight.png';
-
 /**
- * Image-backed ASPECTS prism.
+ * CSS glass pyramid — no image asset.
  * variant:
  *   'plain'     — glass only
  *   'beams'     — opening spectrum (white in + four beams out)
@@ -24,7 +22,22 @@ export default function PrismGlass({ variant = 'plain', tint, className = '' }) 
       )}
 
       <span className="prism-glass__halo" />
-      <img className="prism-glass__img" src={PRISM_SRC} alt="" draggable="false" />
+      <span className="prism-glass__ground" />
+
+      <div className="prism-glass__crystal">
+        <div className="prism-glass__pyramid">
+          <span className="prism-glass__face prism-glass__face--left" />
+          <span className="prism-glass__face prism-glass__face--right" />
+          <span className="prism-glass__face prism-glass__face--front" />
+          <span className="prism-glass__ridge prism-glass__ridge--left" />
+          <span className="prism-glass__ridge prism-glass__ridge--right" />
+          <span className="prism-glass__ridge prism-glass__ridge--center" />
+          <span className="prism-glass__caustic" />
+          <span className="prism-glass__apex" />
+        </div>
+        <span className="prism-glass__specular" />
+        <span className="prism-glass__sheen" />
+      </div>
 
       {withSpectrum && (
         <div className="prism-glass__beams" role="img" aria-label="White light refracting into four coloured beams">
