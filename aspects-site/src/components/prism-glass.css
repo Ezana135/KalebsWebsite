@@ -137,7 +137,7 @@
 
 .prism-glass__sheen {
   position: absolute;
-  inset: -6%;
+  inset: 0;
   background: linear-gradient(
     118deg,
     transparent 30%,
@@ -145,7 +145,8 @@
     rgba(255, 255, 255, 0.06) 54%,
     transparent 68%
   );
-  opacity: 0.38;
+  clip-path: polygon(50% 1%, 93% 92%, 7% 92%);
+  opacity: 0.3;
   z-index: 4;
   mix-blend-mode: soft-light;
   pointer-events: none;
@@ -262,15 +263,28 @@
   position: absolute;
   right: 64%;
   top: 46.5%;
-  width: 130vw;
-  height: 2.8%;
-  background: linear-gradient(270deg, rgba(255, 255, 255, 0.98) 48%, rgba(255, 255, 255, 0.35) 72%, transparent);
-  box-shadow: 0 0 18px rgba(255, 255, 255, 0.65);
+  width: 0;
+  height: 0;
   opacity: var(--incoming-opacity, 0);
   transform: scaleX(var(--incoming-scale, 1));
   transform-origin: right center;
   z-index: 0;
   pointer-events: none;
+}
+
+.prism-glass__incoming::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: calc(145vw * clamp(0.1, var(--incoming-opacity, 0), 1));
+  height: calc(12vh + var(--incoming-opacity, 0) * 30vh);
+  transform: translateY(-50%);
+  transform-origin: right center;
+  clip-path: polygon(100% 50%, 0% 18%, 0% 82%);
+  background: linear-gradient(270deg, rgba(255, 255, 255, 0.98) 48%, rgba(255, 255, 255, 0.35) 72%, transparent);
+  box-shadow: 0 0 22px rgba(255, 255, 255, 0.55);
+  filter: blur(8px);
 }
 
 .prism-glass--projector .prism-glass__emit {
@@ -284,6 +298,7 @@
 .prism-glass__beams {
   position: absolute;
   inset: 0;
+  overflow: visible;
   pointer-events: none;
   z-index: 6;
 }
@@ -292,15 +307,46 @@
   position: absolute;
   transform-origin: left center;
   opacity: 0.94;
+  --beam-scale: 1;
+  --fan-spread: calc(12% + var(--beam-scale) * 24%);
 }
 
 .beam--white {
   top: 46.5%;
   right: 64%;
-  width: 130vw;
-  height: 2.6%;
-  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.45) 35%, rgba(255, 255, 255, 0.98) 78%);
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.75);
+  width: 0;
+  height: 0;
+  transform-origin: right center;
+}
+
+.beam--white::before,
+.beam--white::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  transform-origin: right center;
+  pointer-events: none;
+}
+
+.beam--white::before {
+  width: calc(150vw * var(--beam-scale, 1));
+  height: calc(14vh + var(--beam-scale, 0) * 34vh);
+  transform: translate(0, -50%);
+  clip-path: polygon(100% 50%, 0% calc(50% - var(--fan-spread)), 0% calc(50% + var(--fan-spread)));
+  background: linear-gradient(270deg, transparent 0%, rgba(255, 255, 255, 0.42) 28%, rgba(255, 255, 255, 0.98) 78%);
+  filter: blur(10px);
+  box-shadow: 0 0 24px rgba(255, 255, 255, 0.55);
+}
+
+.beam--white::after {
+  width: calc(165vw * var(--beam-scale, 1));
+  height: calc(18vh + var(--beam-scale, 0) * 40vh);
+  transform: translate(0, -50%);
+  clip-path: polygon(100% 50%, 0% calc(50% - var(--fan-spread) - 4%), 0% calc(50% + var(--fan-spread) + 4%));
+  background: linear-gradient(270deg, transparent 0%, rgba(255, 255, 255, 0.12) 36%, rgba(255, 255, 255, 0.28) 72%);
+  filter: blur(28px);
+  opacity: 0.75;
 }
 
 .beam--gold,
@@ -309,26 +355,79 @@
 .beam--purple {
   left: 51%;
   top: 47%;
-  width: 165vw;
-  height: 5.5%;
-  filter: blur(5px);
-  clip-path: polygon(0 46%, 100% 6%, 100% 94%, 0 58%);
+  width: 0;
+  height: 0;
 }
 
-.beam--gold {
-  background: linear-gradient(90deg, rgba(246, 207, 62, 0.82) 0%, rgba(246, 207, 62, 0.42) 28%, transparent 76%);
+.beam--gold::before,
+.beam--gold::after,
+.beam--red::before,
+.beam--red::after,
+.beam--blue::before,
+.beam--blue::after,
+.beam--purple::before,
+.beam--purple::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: left center;
+  pointer-events: none;
 }
 
-.beam--red {
-  background: linear-gradient(90deg, rgba(255, 88, 72, 0.68) 0%, rgba(255, 88, 72, 0.28) 30%, transparent 76%);
+.beam--gold::before,
+.beam--red::before,
+.beam--blue::before,
+.beam--purple::before {
+  width: calc(210vw * var(--beam-scale, 1));
+  height: calc(16vh + var(--beam-scale, 0) * 40vh);
+  transform: translateY(-50%);
+  clip-path: polygon(0% 50%, 100% calc(50% - var(--fan-spread)), 100% calc(50% + var(--fan-spread)));
+  filter: blur(12px);
 }
 
-.beam--blue {
-  background: linear-gradient(90deg, rgba(72, 134, 255, 0.62) 0%, rgba(72, 134, 255, 0.26) 30%, transparent 76%);
+.beam--gold::after,
+.beam--red::after,
+.beam--blue::after,
+.beam--purple::after {
+  width: calc(230vw * var(--beam-scale, 1));
+  height: calc(20vh + var(--beam-scale, 0) * 46vh);
+  transform: translateY(-50%);
+  clip-path: polygon(0% 50%, 100% calc(50% - var(--fan-spread) - 5%), 100% calc(50% + var(--fan-spread) + 5%));
+  filter: blur(32px);
+  opacity: 0.55;
 }
 
-.beam--purple {
-  background: linear-gradient(90deg, rgba(152, 80, 255, 0.58) 0%, rgba(152, 80, 255, 0.22) 30%, transparent 76%);
+.beam--gold::before {
+  background: linear-gradient(90deg, rgba(246, 207, 62, 0.88) 0%, rgba(246, 207, 62, 0.48) 24%, rgba(246, 207, 62, 0.14) 58%, transparent 82%);
+}
+
+.beam--gold::after {
+  background: linear-gradient(90deg, rgba(246, 207, 62, 0.22) 0%, rgba(246, 207, 62, 0.08) 42%, transparent 84%);
+}
+
+.beam--red::before {
+  background: linear-gradient(90deg, rgba(255, 88, 72, 0.78) 0%, rgba(255, 88, 72, 0.34) 26%, rgba(255, 88, 72, 0.1) 58%, transparent 82%);
+}
+
+.beam--red::after {
+  background: linear-gradient(90deg, rgba(255, 88, 72, 0.18) 0%, rgba(255, 88, 72, 0.06) 42%, transparent 84%);
+}
+
+.beam--blue::before {
+  background: linear-gradient(90deg, rgba(72, 134, 255, 0.74) 0%, rgba(72, 134, 255, 0.32) 26%, rgba(72, 134, 255, 0.1) 58%, transparent 82%);
+}
+
+.beam--blue::after {
+  background: linear-gradient(90deg, rgba(72, 134, 255, 0.18) 0%, rgba(72, 134, 255, 0.06) 42%, transparent 84%);
+}
+
+.beam--purple::before {
+  background: linear-gradient(90deg, rgba(152, 80, 255, 0.72) 0%, rgba(152, 80, 255, 0.3) 26%, rgba(152, 80, 255, 0.1) 58%, transparent 82%);
+}
+
+.beam--purple::after {
+  background: linear-gradient(90deg, rgba(152, 80, 255, 0.18) 0%, rgba(152, 80, 255, 0.06) 42%, transparent 84%);
 }
 
 @media (prefers-reduced-motion: reduce) {

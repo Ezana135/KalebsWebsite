@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { CHAPTERS } from '../data/chapters';
-import EmailCapture from '../components/EmailCapture';
 import MediaFrame from '../components/MediaFrame';
 import PrismGlass from '../components/PrismGlass';
 import useScrollProgress from '../hooks/useScrollProgress';
@@ -20,6 +19,24 @@ const EMIT_COLORS = {
   art: 'rgba(150, 80, 230, 0.74)',
   white: 'rgba(255, 255, 255, 0.62)',
 };
+
+const EMIT_RGB = {
+  ego: [228, 186, 88],
+  love: [90, 150, 220],
+  reason: [211, 50, 48],
+  art: [150, 80, 230],
+  white: [255, 255, 255],
+};
+
+function mixEmitColor(fromColor, toColor, progress) {
+  const fromEntry = Object.entries(EMIT_COLORS).find(([, color]) => color === fromColor)?.[0] || 'white';
+  const toEntry = Object.entries(EMIT_COLORS).find(([, color]) => color === toColor)?.[0] || 'white';
+  const from = EMIT_RGB[fromEntry];
+  const to = EMIT_RGB[toEntry];
+  const t = progress * progress * (3 - 2 * progress);
+  const channels = from.map((channel, index) => Math.round(channel + (to[index] - channel) * t));
+  return `rgba(${channels.join(', ')}, 0.74)`;
+}
 
 function PlayIcon() {
   return (
@@ -153,9 +170,6 @@ function EgoChapter({ chapter }) {
             <MediaFrame scene="ego-mirror" caption={chapter.heroCaption} time={chapter.heroTime} className="ego-layout__film" />
             <TrackPanel chapter={chapter} className="ego-layout__tracks" buttonLabel="Listen to chapter" />
             <EssayPanel chapter={chapter} className="ego-layout__essay" image="ego" eyebrow="The essay" />
-            <div className="ego-layout__email">
-              <EmailCapture heading="Stay in the loop" body="New music, visuals, and essays: straight to your inbox." tone="dark" compact />
-            </div>
           </div>
         </div>
       </div>
@@ -186,13 +200,7 @@ function LoveChapter({ chapter }) {
           <div className="love-layout__content">
             <MediaFrame scene="love-lake" caption={chapter.heroCaption} className="love-layout__film" />
             <TrackPanel chapter={chapter} className="love-layout__tracks" compact buttonLabel="Listen" />
-            <div className="love-layout__portrait" aria-hidden="true">
-              <img src="/media/landing-portrait.png" alt="" draggable="false" />
-            </div>
             <EssayPanel chapter={chapter} className="love-layout__essay" eyebrow="Essay" />
-            <div className="love-layout__email">
-              <EmailCapture heading="Stay close." body="New music, visuals, and reflections." cta="Join the list" tone="sand" />
-            </div>
           </div>
         </div>
       </div>
@@ -223,7 +231,6 @@ function ReasonChapter({ chapter }) {
             <MediaFrame scene="reason-archive" caption={chapter.heroCaption} time={chapter.heroTime} className="reason-layout__film" />
             <TrackPanel chapter={chapter} className="reason-layout__tracks" />
             <EssayPanel chapter={chapter} className="reason-layout__essay" image="reason" eyebrow="Essay" />
-            <EmailCapture heading="Stay connected" body="New music, visuals, and essays. Straight to your inbox." tone="dark" compact />
           </div>
         </div>
       </div>
@@ -255,7 +262,6 @@ function ArtChapter({ chapter }) {
             <MediaFrame scene="art-collage" caption={chapter.heroCaption} className="art-layout__film" />
             <TrackPanel chapter={chapter} className="art-layout__tracks" buttonLabel="Play album" />
             <EssayPanel chapter={chapter} className="art-layout__essay" image="art" eyebrow="Essay" />
-            <EmailCapture heading="Join the journey" body="New works, process notes, and early releases. Straight to your inbox." tone="dark" />
           </div>
         </div>
       </div>
@@ -406,10 +412,13 @@ export default function Journey() {
       const span = Math.max(chapterEnd - introStart, vh * 2);
       const p = clamp01((scrollY - introStart) / span);
       const glideT = smoothstep(clamp01(p / glidePortion));
+      const revealT = smoothstep(clamp01((p - 0.015) / 0.28));
       const incoming = p < 0.34
         ? lerp(incomingStart, 0.05, smoothstep(clamp01((p - 0.02) / 0.3)))
         : Math.max(0, lerp(0.05, 0, smoothstep(clamp01((p - 0.34) / 0.18))));
-      const emit = smoothstep(clamp01((p - 0.04) / 0.88)) * 0.92;
+      const emit = projectionMin > 0
+        ? lerp(0.7, 0.92, revealT)
+        : revealT * 0.92;
 
       let projectionP;
       if (contentStart && contentStart > introStart) {
@@ -422,7 +431,7 @@ export default function Journey() {
           projectionP = lerp(0.78, 1, chapterP);
         }
       } else {
-        projectionP = projectionMin + (1 - projectionMin) * smoothstep(clamp01((p - 0.02) / 0.92));
+        projectionP = projectionMin + (1 - projectionMin) * revealT;
       }
 
       return {
@@ -439,41 +448,102 @@ export default function Journey() {
       };
     };
 
+    const loveSequence = ({
+      scrollY,
+      lovePassageStart,
+      loveStart,
+      loveLightsOutStart,
+      vh,
+      dockX,
+      dockPassageY,
+      dockW,
+      loveDockX,
+      loveDockY,
+      loveDockW,
+    }) => {
+      const closeEnd = lovePassageStart + vh * 0.52;
+      const glideEnd = loveStart;
+      const closeP = smoothstep(clamp01((scrollY - lovePassageStart) / Math.max(closeEnd - lovePassageStart, vh * 0.2)));
+      const glideP = smoothstep(clamp01((scrollY - closeEnd) / Math.max(glideEnd - closeEnd, vh * 0.65)));
+      const loveChapterSpan = Math.max(loveLightsOutStart - loveStart, vh * 1.5);
+      const openP = smoothstep(clamp01((scrollY - loveStart) / (loveChapterSpan * 0.34)));
+
+      if (scrollY < closeEnd) {
+        return {
+          x: dockX,
+          y: dockPassageY,
+          w: dockW,
+          incoming: lerp(0.08, 0.02, closeP),
+          emit: lerp(0.9, 0.04, closeP),
+          whiteBeam: 0,
+          spectrumBeam: 0,
+          projectionP: lerp(1, 0, closeP),
+          isDocked: true,
+          useSpectrum: false,
+          theme: 'ego',
+          emitColor: EMIT_COLORS.ego,
+        };
+      }
+
+      if (scrollY < glideEnd) {
+        return {
+          x: lerp(dockX, loveDockX, glideP),
+          y: lerp(dockPassageY, loveDockY, glideP),
+          w: lerp(dockW, loveDockW, glideP),
+          incoming: lerp(0.02, 0.48, glideP),
+          emit: lerp(0.04, 0.18, glideP),
+          whiteBeam: 0,
+          spectrumBeam: 0,
+          projectionP: 0,
+          isDocked: glideP > 0.12,
+          useSpectrum: false,
+          theme: 'ego',
+          emitColor: EMIT_COLORS.ego,
+        };
+      }
+
+      const loveArm = smoothstep(clamp01(openP / 0.72));
+      return {
+        x: loveDockX,
+        y: loveDockY,
+        w: loveDockW,
+        incoming: lerp(0.48, 0.05, openP),
+        emit: loveArm * 0.92,
+        whiteBeam: 0,
+        spectrumBeam: 0,
+        projectionP: openP,
+        isDocked: true,
+        useSpectrum: false,
+        theme: loveArm > 0.22 ? 'love' : 'ego',
+        emitColor: loveArm > 0.22 ? EMIT_COLORS.love : EMIT_COLORS.ego,
+      };
+    };
+
     const chapterHandoff = ({
       scrollY,
       start,
       end,
       vh,
       vw,
-      mobile,
-      from: { x: fx, y: fy, w: fw },
+      from: { x: fx, y: fy, w: fw, color: fromColor },
       to: { x: tx, y: ty, w: tw, color: toColor },
     }) => {
-      const span = Math.max(end - start, vh * 2.6);
+      const span = Math.max(end - start, vh * 1.8);
       const p = clamp01((scrollY - start) / span);
 
-      const lightsFade = smoothstep(clamp01(p / 0.28));
-      const toBlack = smoothstep(clamp01((p - 0.28) / 0.18));
-      const whiteRise = smoothstep(clamp01((p - 0.62) / 0.2));
-      const dockGlide = smoothstep(clamp01((p - 0.72) / 0.26));
-      const themeArm = smoothstep(clamp01((p - 0.82) / 0.16));
+      const lightsFade = smoothstep(clamp01(p / 0.34));
+      const fadeToDark = smoothstep(clamp01((p - 0.02) / 0.36));
+      const revealDarkStage = smoothstep(clamp01((p - 0.68) / 0.3));
+      const dockGlide = smoothstep(clamp01((p - 0.62) / 0.36));
+      const themeArm = smoothstep(clamp01((p - 0.52) / 0.44));
       const centerGlide = smoothstep(clamp01((p - 0.3) / 0.34));
 
       const cx = vw * 0.5;
       const cy = vh * 0.48;
       const midW = lerp(fw, tw, 0.42);
 
-      let blackOpacity = 0;
-      if (p < 0.28) blackOpacity = 0;
-      else if (p < 0.48) blackOpacity = toBlack;
-      else if (p < 0.62) blackOpacity = 1;
-      else blackOpacity = Math.max(0, 1 - smoothstep((p - 0.62) / 0.2));
-
-      let prismOpacity = 1;
-      if (p < 0.28) prismOpacity = 1;
-      else if (p < 0.4) prismOpacity = lerp(1, 0, smoothstep((p - 0.28) / 0.12));
-      else if (p < 0.62) prismOpacity = 0;
-      else prismOpacity = lerp(0, 1, whiteRise);
+      const blackOpacity = fadeToDark * (1 - revealDarkStage);
+      const prismOpacity = 1;
 
       const preCenterX = lerp(fx, cx, centerGlide);
       const preCenterY = lerp(fy, cy, centerGlide);
@@ -484,28 +554,24 @@ export default function Journey() {
         x: lerp(preCenterX, tx, postDock),
         y: lerp(preCenterY, ty, postDock),
         w: lerp(preCenterW, tw, postDock),
-        emit: p < 0.28
-          ? lerp(0.9, 0, lightsFade)
-          : p < 0.62
-            ? 0
-            : lerp(0.06, 0.72, themeArm),
-        whiteBeam: p < 0.62 ? 0 : whiteRise * (1 - themeArm * 0.88),
+        emit: p < 0.34
+          ? lerp(0.9, 0.08, lightsFade)
+          : lerp(0.08, 0.76, themeArm),
+        whiteBeam: 0,
         spectrumBeam: 0,
-        projectionP: p < 0.28
-          ? lerp(1, 0, lightsFade)
-          : p < 0.74
-            ? 0
-            : lerp(0, 0.3, themeArm),
-        incoming: p < 0.62 ? 0 : whiteRise * 0.92 * (1 - themeArm * 0.35),
+        projectionP: p < 0.34
+          ? lerp(1, 0.04, lightsFade)
+          : lerp(0.04, 0.3, themeArm),
+        incoming: 0,
         prismOpacity,
         blackOpacity,
-        isDark: blackOpacity > 0.1,
-        isDocked: p < 0.24 || p > 0.76,
+        isDark: fadeToDark > 0.35,
+        isDocked: p < 0.2 || p > 0.7,
         useSpectrum: false,
-        emitColor: themeArm > 0.32 ? toColor : EMIT_COLORS.white,
-        theme: themeArm > 0.32
+        emitColor: mixEmitColor(fromColor, toColor, p),
+        theme: themeArm > 0.5
           ? (toColor === EMIT_COLORS.reason ? 'reason' : 'art')
-          : 'white',
+          : (fromColor === EMIT_COLORS.love ? 'love' : 'reason'),
       };
     };
 
@@ -531,15 +597,20 @@ export default function Journey() {
       const y = lerp(openingEndY, dockPassageY, glideT);
       const w = lerp(openingEndW, dockW, glideT);
 
-      const spectrumBeam = p < 0.2
-        ? lerp(0.88, 0.2, smoothstep(p / 0.2))
-        : Math.max(0, lerp(0.2, 0, smoothstep((p - 0.2) / 0.16)));
-      const whiteBeam = p < 0.24 ? lerp(0.48, 0, smoothstep(p / 0.24)) : 0;
+      const spectrumBeam = p < 0.32
+        ? lerp(0.94, 0.38, smoothstep(p / 0.32))
+        : Math.max(0, lerp(0.38, 0, smoothstep((p - 0.32) / 0.26)));
+      const whiteBeam = p < 0.38 ? lerp(0.58, 0, smoothstep(p / 0.38)) : 0;
       const incoming = p < 0.4
         ? lerp(0.58, 0.06, smoothstep(clamp01((p - 0.08) / 0.32)))
         : Math.max(0, lerp(0.06, 0, smoothstep(clamp01((p - 0.4) / 0.2))));
       const emit = smoothstep(clamp01((p - 0.06) / 0.94)) * 0.92;
-      const projectionP = smoothstep(clamp01((p - 0.04) / 0.96));
+      const egoStart = ego?.offsetTop ?? openingEnd;
+      const passageP = clamp01((scrollY - egoIntroStart) / Math.max(egoStart - egoIntroStart, vh));
+      const chapterP = clamp01((scrollY - egoStart) / Math.max(egoEnd - egoStart, vh * 1.2));
+      const projectionP = scrollY < egoStart
+        ? lerp(0, 0.08, smoothstep(passageP))
+        : lerp(0.08, 1, smoothstep(clamp01(chapterP / 0.24)));
 
       return {
         x,
@@ -551,7 +622,7 @@ export default function Journey() {
         spectrumBeam,
         projectionP,
         isDocked: glideT > 0.08,
-        useSpectrum: spectrumBeam > 0.05 && p < 0.34,
+        useSpectrum: spectrumBeam > 0.05 && p < 0.56,
       };
     };
 
@@ -573,8 +644,8 @@ export default function Journey() {
 
       const openingP = scrollSpan(opening).p;
       const projectorP = clamp01((openingP - 0.34) / 0.46);
-      const beamP = clamp01((openingP - 0.68) / 0.2);
-      const colorBeamP = clamp01((openingP - 0.76) / 0.2);
+      const beamP = clamp01((openingP - 0.52) / 0.38);
+      const colorBeamP = clamp01((openingP - 0.58) / 0.36);
 
       const egoPassageP = scrollSpan(egoPassage).p;
       const egoP = scrollSpan(ego).p;
@@ -610,8 +681,8 @@ export default function Journey() {
       else if (scrollY >= egoPassageStart) zone = 'ego-passage';
       else if (scrollY >= openingEnd - vh * 0.85) zone = 'exit-opening';
 
-      const loveLightsOutStart = loveEnd - vh * 0.55;
-      const reasonLightsOutStart = reasonEnd - vh * 0.55;
+      const loveLightsOutStart = loveEnd - vh * 0.1;
+      const reasonLightsOutStart = reasonEnd - vh * 0.1;
 
       const inEgoSequence = scrollY >= openingEnd - vh * 0.85 && scrollY < lovePassageStart;
       const inLoveSequence = scrollY >= lovePassageStart && scrollY < loveLightsOutStart;
@@ -697,20 +768,18 @@ export default function Journey() {
         emitColor = EMIT_COLORS.ego;
         theme = 'ego';
       } else if (inLoveSequence && !reduceMotion) {
-        const loveState = chapterSequence({
+        const loveState = loveSequence({
           scrollY,
-          introStart: lovePassageStart,
-          contentStart: loveStart,
-          chapterEnd: loveLightsOutStart,
+          lovePassageStart,
+          loveStart,
+          loveLightsOutStart,
           vh,
-          fromX: dockX,
-          fromY: dockPassageY,
-          fromW: dockW,
-          dockX: loveDockX,
-          dockY: loveDockY,
-          dockW: loveDockW,
-          glidePortion: 0.3,
-          incomingStart: 0.52,
+          dockX,
+          dockPassageY,
+          dockW,
+          loveDockX,
+          loveDockY,
+          loveDockW,
         });
         x = loveState.x;
         y = loveState.y;
@@ -722,8 +791,8 @@ export default function Journey() {
         projectionP = loveState.projectionP;
         isDocked = loveState.isDocked;
         useSpectrum = loveState.useSpectrum;
-        emitColor = EMIT_COLORS.love;
-        theme = 'love';
+        emitColor = loveState.emitColor;
+        theme = loveState.theme;
       } else if (inLoveReasonHandoff && !reduceMotion) {
         const handoff = chapterHandoff({
           scrollY,
@@ -731,8 +800,7 @@ export default function Journey() {
           end: reasonStart,
           vh,
           vw,
-          mobile,
-          from: { x: loveDockX, y: loveDockY, w: loveDockW },
+          from: { x: loveDockX, y: loveDockY, w: loveDockW, color: EMIT_COLORS.love },
           to: { x: reasonDockX, y: reasonDockY, w: reasonDockW, color: EMIT_COLORS.reason },
         });
         x = handoff.x;
@@ -786,8 +854,7 @@ export default function Journey() {
           end: artStart,
           vh,
           vw,
-          mobile,
-          from: { x: reasonDockX, y: reasonDockY, w: reasonDockW },
+          from: { x: reasonDockX, y: reasonDockY, w: reasonDockW, color: EMIT_COLORS.reason },
           to: { x: artDockX, y: artDockY, w: artDockW, color: EMIT_COLORS.art },
         });
         x = handoff.x;
@@ -897,20 +964,18 @@ export default function Journey() {
         };
 
         const loveStateAt = (yPos = scrollY) => {
-          const loveState = chapterSequence({
+          const loveState = loveSequence({
             scrollY: yPos,
-            introStart: lovePassageStart,
-            contentStart: loveStart,
-            chapterEnd: loveLightsOutStart,
+            lovePassageStart,
+            loveStart,
+            loveLightsOutStart,
             vh,
-            fromX: dockX,
-            fromY: dockPassageY,
-            fromW: dockW,
-            dockX: loveDockX,
-            dockY: loveDockY,
-            dockW: loveDockW,
-            glidePortion: 0.3,
-            incomingStart: 0.52,
+            dockX,
+            dockPassageY,
+            dockW,
+            loveDockX,
+            loveDockY,
+            loveDockW,
           });
           return packState({
             x: loveState.x,
@@ -920,8 +985,8 @@ export default function Journey() {
             emit: loveState.emit,
             projectionP: loveState.projectionP,
             isDocked: loveState.isDocked,
-            theme: 'love',
-            emitColor: EMIT_COLORS.love,
+            theme: loveState.theme,
+            emitColor: loveState.emitColor,
             blackOpacity: 0,
             prismOpacity: 1,
             isDark: false,
@@ -938,8 +1003,7 @@ export default function Journey() {
             end: reasonStart,
             vh,
             vw,
-            mobile,
-            from: { x: loveDockX, y: loveDockY, w: loveDockW },
+            from: { x: loveDockX, y: loveDockY, w: loveDockW, color: EMIT_COLORS.love },
             to: { x: reasonDockX, y: reasonDockY, w: reasonDockW, color: EMIT_COLORS.reason },
           });
           return packState({
@@ -1003,8 +1067,7 @@ export default function Journey() {
             end: artStart,
             vh,
             vw,
-            mobile,
-            from: { x: reasonDockX, y: reasonDockY, w: reasonDockW },
+            from: { x: reasonDockX, y: reasonDockY, w: reasonDockW, color: EMIT_COLORS.reason },
             to: { x: artDockX, y: artDockY, w: artDockW, color: EMIT_COLORS.art },
           });
           return packState({
@@ -1027,9 +1090,7 @@ export default function Journey() {
         };
 
         let blended = null;
-        if (scrollY > lovePassageStart - blendWindow && scrollY < lovePassageStart + blendWindow) {
-          blended = blendAt(lovePassageStart, egoStateAt, loveStateAt);
-        } else if (scrollY > loveLightsOutStart - blendWindow && scrollY < loveLightsOutStart + blendWindow) {
+        if (scrollY > loveLightsOutStart - blendWindow && scrollY < loveLightsOutStart + blendWindow) {
           blended = blendAt(loveLightsOutStart, loveStateAt, loveHandoffAt);
         } else if (scrollY > reasonStart - blendWindow && scrollY < reasonStart + blendWindow) {
           blended = blendAt(reasonStart, loveHandoffAt, reasonStateAt);
@@ -1077,10 +1138,16 @@ export default function Journey() {
       else if (inReasonArtHandoff || zone === 'art-blackout') chapterId = 'art-handoff';
       else if (inReasonSequence) chapterId = 'reason';
       else if (inLoveReasonHandoff || zone === 'reason-blackout') chapterId = 'reason-handoff';
-      else if (inLoveSequence) chapterId = scrollY < loveStart ? 'love-passage' : 'love';
+      else if (inLoveSequence) {
+        const loveCloseEnd = lovePassageStart + vh * 0.52;
+        if (scrollY < loveCloseEnd) chapterId = 'ego';
+        else if (scrollY < loveStart) chapterId = 'ego-passage';
+        else chapterId = 'love';
+      }
       else if (inEgoSequence) chapterId = scrollY < egoStart ? 'ego-passage' : 'ego';
       else if (zone === 'exit-opening') chapterId = 'exit-opening';
       root.dataset.chapter = chapterId;
+      root.dataset.final = inArtSequence && artP >= 0.995 ? 'true' : 'false';
       document.body.dataset.journeyDark = isDark ? 'true' : 'false';
 
       const prismH = w / 0.68;
@@ -1200,6 +1267,7 @@ export default function Journey() {
       prism.style.setProperty('--incoming-opacity', renderIncoming.toFixed(4));
       prism.style.setProperty('--emit-opacity', renderEmit.toFixed(4));
       prism.style.setProperty('--emit-color', emitColor);
+      beam.style.setProperty('--handoff-color', emitColor);
       prism.style.setProperty('--white-beam', renderWhiteBeam.toFixed(4));
       prism.style.setProperty('--spectrum-beam', renderSpectrumBeam.toFixed(4));
 
@@ -1210,13 +1278,15 @@ export default function Journey() {
       beam.style.setProperty('--projection-p', renderProjectionP.toFixed(4));
       beam.style.setProperty('--emit-opacity', renderEmit.toFixed(4));
       beam.dataset.theme = theme;
+      const inHandoff = inLoveReasonHandoff || inReasonArtHandoff || zone === 'reason-blackout' || zone === 'art-blackout';
+      beam.classList.toggle('is-handoff', inHandoff);
       beam.classList.toggle('is-active', ['ego', 'love', 'reason', 'art', 'white'].includes(theme) && renderProjectionP > 0.06 && (renderEmit > 0.05 || renderWhiteBeam > 0.08));
 
       prism.classList.toggle('is-spectrum', useSpectrum);
       prism.classList.toggle('is-emitting', renderEmit > 0.04 || renderWhiteBeam > 0.12 || renderProjectionP > 0.06);
       prism.classList.toggle('is-docked', isDocked);
-      prism.classList.toggle('is-opening', zone === 'opening' || (inEgoSequence && renderProjectionP < 0.28));
-      prism.classList.toggle('is-blackout', inLoveReasonHandoff || inReasonArtHandoff || zone === 'reason-blackout' || zone === 'art-blackout');
+      prism.classList.toggle('is-opening', zone === 'opening' || (inEgoSequence && (renderSpectrumBeam > 0.08 || renderWhiteBeam > 0.08)));
+      prism.classList.toggle('is-blackout', inHandoff);
       prism.classList.toggle('journey-prism--ego', theme === 'ego');
       prism.classList.toggle('journey-prism--love', theme === 'love');
       prism.classList.toggle('journey-prism--reason', theme === 'reason');
@@ -1226,13 +1296,23 @@ export default function Journey() {
     let raf = 0;
     const tick = () => {
       update();
-      raf = requestAnimationFrame(tick);
+      if (root.dataset.final !== 'true') {
+        raf = requestAnimationFrame(tick);
+      } else {
+        raf = 0;
+      }
+    };
+
+    const resume = () => {
+      if (!raf) raf = requestAnimationFrame(tick);
     };
 
     tick();
-    window.addEventListener('resize', update);
+    window.addEventListener('scroll', resume, { passive: true });
+    window.addEventListener('resize', resume);
     return () => {
-      window.removeEventListener('resize', update);
+      window.removeEventListener('scroll', resume);
+      window.removeEventListener('resize', resume);
       if (raf) cancelAnimationFrame(raf);
       document.body.dataset.journeyDark = '';
       root.style.setProperty('--projection-p', '0');
@@ -1241,6 +1321,7 @@ export default function Journey() {
       root.style.setProperty('--beam-reach', '0px');
       root.style.setProperty('--fan-height', '0px');
       root.dataset.chapter = '';
+      root.dataset.final = '';
       root.style.setProperty('--blackout-opacity', '0');
     };
   }, []);

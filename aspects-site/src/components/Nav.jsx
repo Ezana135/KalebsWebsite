@@ -4,15 +4,11 @@ import PrismMark from './PrismMark';
 import './nav.css';
 
 const LINKS = [
-  { to: '/music', anchor: 'music', label: 'Music' },
-  { to: '/film', anchor: 'film', label: 'Visuals' },
-  { to: '/about', anchor: 'prism', label: 'About' },
+  { to: '/music', label: 'Music' },
+  { to: '/film', label: 'Visuals' },
+  { to: '/about', label: 'About' },
   { to: '/contact', label: 'Contact' },
 ];
-
-function scrollHome(id) {
-  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
 
 export default function Nav({ dark = false, journey = false }) {
   const [open, setOpen] = useState(false);
@@ -34,7 +30,7 @@ export default function Nav({ dark = false, journey = false }) {
           onClick={(event) => {
             if (journey) {
               event.preventDefault();
-              scrollHome('top');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
             }
           }}
         >
@@ -43,26 +39,15 @@ export default function Nav({ dark = false, journey = false }) {
         </NavLink>
 
         <nav className="nav__links" aria-label="Primary">
-          {LINKS.map((l) =>
-            journey && l.anchor ? (
-              <button
-                key={l.label}
-                type="button"
-                className="nav__link"
-                onClick={() => scrollHome(l.anchor)}
-              >
-                {l.label}
-              </button>
-            ) : (
-              <NavLink
-                key={l.to}
-                to={l.to}
-                className={({ isActive }) => `nav__link ${isActive ? 'is-active' : ''}`}
-              >
-                {l.label}
-              </NavLink>
-            )
-          )}
+          {LINKS.map((l) => (
+            <NavLink
+              key={l.to}
+              to={l.to}
+              className={({ isActive }) => `nav__link ${isActive ? 'is-active' : ''}`}
+            >
+              {l.label}
+            </NavLink>
+          ))}
         </nav>
 
         <button
@@ -82,21 +67,9 @@ export default function Nav({ dark = false, journey = false }) {
           <ul>
             {LINKS.map((l) => (
               <li key={l.to}>
-                {journey && l.anchor ? (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setOpen(false);
-                      scrollHome(l.anchor);
-                    }}
-                  >
-                    {l.label}
-                  </button>
-                ) : (
-                  <NavLink to={l.to} onClick={() => setOpen(false)}>
-                    {l.label}
-                  </NavLink>
-                )}
+                <NavLink to={l.to} onClick={() => setOpen(false)}>
+                  {l.label}
+                </NavLink>
               </li>
             ))}
             <li>
