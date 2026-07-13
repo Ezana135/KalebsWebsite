@@ -2560,3 +2560,119 @@ body[data-journey-dark='true'] .nav--journey {
     display: none;
   }
 }
+
+/* Safari / iOS WebKit: same layout, cheaper paint (no choreography/position changes). */
+.journey.is-safari {
+  --projection-reveal-mask: none;
+}
+
+.journey.is-safari .chapter-projector__stage,
+.journey.is-safari .chapter-projector__wash,
+.journey.is-safari .chapter-passage__wash,
+.journey.is-safari .chapter-projector--ego .ego-layout,
+.journey.is-safari .chapter-projector--love .love-layout,
+.journey.is-safari .chapter-projector--reason .reason-layout,
+.journey.is-safari .chapter-projector--art .art-layout {
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+
+.journey.is-safari .opening-scene__word,
+.journey.is-safari .opening-scene__portrait,
+.journey.is-safari .opening-scene__ghost,
+.journey.is-safari .chapter-projector .ego-layout__content,
+.journey.is-safari .chapter-projector .love-layout__content,
+.journey.is-safari .chapter-projector .reason-layout__content,
+.journey.is-safari .chapter-projector .art-layout__content,
+.journey.is-safari .chapter-projector--ego .ego-layout,
+.journey.is-safari .chapter-projector--ego .chapter-projector__stage::after,
+.journey.is-safari .chapter-projector--love .chapter-projector__stage::after,
+.journey.is-safari .journey-beam__fan,
+.journey.is-safari .journey-beam__wash,
+.journey.is-safari .journey-beam.is-handoff .journey-beam__fan,
+.journey.is-safari .journey-beam[data-theme='love'] .journey-beam__fan,
+.journey.is-safari .journey-prism .prism-glass__crystal,
+.journey.is-safari .journey-prism.is-emitting .prism-glass__crystal,
+.journey.is-safari[data-dark='true'] .journey-prism .prism-glass__crystal,
+.journey.is-safari .journey-prism.is-blackout .prism-glass__crystal,
+.journey.is-safari .journey-prism .prism-glass__face--left,
+.journey.is-safari .journey-prism .prism-glass__face--right,
+.journey.is-safari .opening-scene__appendix-item.is-lit,
+.journey.is-safari .opening-scene__appendix-item--ego.is-lit,
+.journey.is-safari .opening-scene__appendix-item--love.is-lit,
+.journey.is-safari .opening-scene__appendix-item--reason.is-lit,
+.journey.is-safari .opening-scene__appendix-item--art.is-lit {
+  filter: none !important;
+}
+
+.journey.is-safari .journey-beam__wash,
+.journey.is-safari .journey-beam__core,
+.journey.is-safari .chapter-projector--ego .chapter-projector__stage::after,
+.journey.is-safari .chapter-projector--love .chapter-projector__stage::after,
+.journey.is-safari .prism-glass__sheen,
+.journey.is-safari .prism-glass__halo,
+.journey.is-safari .prism-glass__ground,
+.journey.is-safari .prism-glass__flare,
+.journey.is-safari .prism-glass__caustic {
+  display: none !important;
+}
+
+.journey.is-safari .journey-beam__fan {
+  filter: none !important;
+  opacity: calc(0.42 + var(--beam-p, var(--projection-p, 0)) * 0.38);
+}
+
+.journey.is-safari .prism-glass__emit,
+.journey.is-safari .prism-glass__incoming::before,
+.journey.is-safari .beam--white::before,
+.journey.is-safari .beam--white::after,
+.journey.is-safari .beam--gold::before,
+.journey.is-safari .beam--gold::after,
+.journey.is-safari .beam--red::before,
+.journey.is-safari .beam--red::after,
+.journey.is-safari .beam--blue::before,
+.journey.is-safari .beam--blue::after,
+.journey.is-safari .beam--purple::before,
+.journey.is-safari .beam--purple::after {
+  filter: none !important;
+}
+
+.journey.is-safari .beam--white::after,
+.journey.is-safari .beam--gold::after,
+.journey.is-safari .beam--red::after,
+.journey.is-safari .beam--blue::after,
+.journey.is-safari .beam--purple::after {
+  opacity: 0.28;
+}
+
+.journey.is-safari .prism-glass__specular,
+.journey.is-safari .prism-glass__caustic {
+  mix-blend-mode: normal !important;
+}
+
+body.journey-safari .nav--journey,
+body.journey-safari[data-journey-dark='true'] .nav--journey {
+  mix-blend-mode: normal !important;
+  backdrop-filter: none !important;
+}
+
+.journey.is-safari .journey-prism {
+  will-change: auto;
+}
+
+.journey.is-safari .journey-prism.is-docked:not(.is-opening) .prism-glass__beams {
+  clip-path: none;
+  opacity: 0;
+}
+
+.journey.is-safari .prism-glass__sheen,
+.journey.is-safari .prism-glass__flare {
+  animation: none !important;
+}
+
+.journey.is-safari .chapter-projector__stage,
+.journey.is-safari .chapter-projector__wash,
+.journey.is-safari .opening-scene__stage {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}

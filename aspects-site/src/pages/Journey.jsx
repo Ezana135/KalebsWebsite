@@ -327,6 +327,19 @@ export default function Journey() {
     const beam = beamRef.current;
     if (!root || !prism || !beam) return undefined;
 
+    const isSafariEngine = (() => {
+      const ua = navigator.userAgent || '';
+      const vendor = navigator.vendor || '';
+      const iOS = /iP(ad|hone|od)/.test(ua)
+        || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      if (iOS) return true;
+      return vendor.includes('Apple')
+        && /Safari/.test(ua)
+        && !/Chrome|Chromium|CriOS|Edg|EdgiOS|Firefox|FxiOS|OPR|Opera/.test(ua);
+    })();
+    root.classList.toggle('is-safari', isSafariEngine);
+    document.body.classList.toggle('journey-safari', isSafariEngine);
+
     const elements = {
       opening: root.querySelector('.opening-scene'),
       openingSlot: root.querySelector('.opening-scene__prism-slot'),
@@ -1298,6 +1311,8 @@ export default function Journey() {
       window.removeEventListener('resize', resume);
       if (raf) cancelAnimationFrame(raf);
       document.body.dataset.journeyDark = '';
+      root.classList.remove('is-safari');
+      document.body.classList.remove('journey-safari');
       root.style.setProperty('--projection-p', '0');
       root.style.setProperty('--projection-origin-x', '0px');
       root.style.setProperty('--projection-edge-x', '0px');
