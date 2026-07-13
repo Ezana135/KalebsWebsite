@@ -42,15 +42,14 @@ export default function PrismGlass({ variant = 'plain', tint, className = '' }) 
       {withSpectrum && (
         <div className="prism-glass__beams" role="img" aria-label="White light refracting into four coloured beams">
           <span className="beam beam--white" />
-          {/* Spectrum order per Drafts/image.png: yellow, red, blue, green */}
-          <span className="beam beam--yellow" />
+          <span className="beam beam--gold" />
           <span className="beam beam--red" />
           <span className="beam beam--blue" />
-          <span className="beam beam--green" />
+          <span className="beam beam--purple" />
         </div>
       )}
 
-      {withFlare && <span className="prism-glass__flare" />}
+      {variant === 'flare' && <span className="prism-glass__flare" />}
     </div>
   );
 }
