@@ -193,6 +193,7 @@
   aspect-ratio: auto;
 }
 
+/* small rainbow ground flare pooling at the base */
 .prism-glass__flare {
   position: absolute;
   left: 7%;
@@ -201,11 +202,10 @@
   height: 11%;
   background: linear-gradient(
     90deg,
-    rgba(255, 57, 57, 0.58),
-    rgba(255, 212, 61, 0.56) 25%,
-    rgba(92, 234, 148, 0.44) 50%,
-    rgba(72, 134, 255, 0.54) 75%,
-    rgba(190, 90, 255, 0.5)
+    rgba(255, 212, 61, 0.56),
+    rgba(255, 57, 57, 0.58) 30%,
+    rgba(72, 134, 255, 0.54) 62%,
+    rgba(92, 234, 148, 0.5)
   );
   filter: blur(10px);
   border-radius: 50%;
@@ -349,9 +349,12 @@
   opacity: 0.75;
 }
 
-.beam--gold,
+/* --gold and --purple are legacy aliases for yellow / green */
+.beam--yellow,
 .beam--red,
 .beam--blue,
+.beam--green,
+.beam--gold,
 .beam--purple {
   left: 51%;
   top: 47%;

@@ -662,10 +662,6 @@
   align-items: end;
 }
 
-.music-hub__prism {
-  width: 128px;
-}
-
 .music-hub h2 {
   font-size: clamp(82px, 10vw, 165px);
   font-weight: 900;
@@ -2529,6 +2525,11 @@ body[data-journey-dark='true'] .nav--journey {
     padding-inline: 18px;
   }
 
+  /* duplicate of the header strapline; overlaps the title on small screens */
+  .reason-layout__left::after {
+    display: none;
+  }
+
   .reason-layout h2,
   .ego-layout__head h2,
   .love-layout__head h2,
@@ -2542,12 +2543,24 @@ body[data-journey-dark='true'] .nav--journey {
     inset: 0;
     border-radius: 0;
   }
+
+  .journey-prism {
+    opacity: 0.88;
+  }
+
+  .journey-prism__label {
+    display: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .projection-overlay,
   .projection-overlay.is-running,
   .projection-overlay.is-running .projection-overlay__label,
+  .journey-prism__label,
+  .journey-prism .prism-glass__incoming,
+  .journey-prism .prism-glass__emit,
+  .journey-prism .beam,
   .music-hub__grid,
   .love-layout,
   .reason-layout,

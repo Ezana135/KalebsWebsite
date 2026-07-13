@@ -45,7 +45,8 @@ export default function Chapter({ chapter }) {
           chapter's light, as in the approved Love draft */}
       <header className="chapter__hero">
         <div className="chapter__prism" aria-hidden="true">
-          <PrismGlass variant="emit" tint={EMIT[chapter.id]} />
+          {/* Reason's beam angles down-right across the page, per the draft */}
+          <PrismGlass variant="emit" tint={EMIT[chapter.id]} emitAngle={chapter.id === 'reason' ? 'down' : 'right'} />
         </div>
 
         <div className="container chapter__hero-grid">
