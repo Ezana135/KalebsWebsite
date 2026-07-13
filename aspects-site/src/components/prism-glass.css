@@ -1,0 +1,438 @@
+.prism-glass {
+  --prism-tint: rgba(140, 190, 255, 0.22);
+  --prism-edge: rgba(255, 255, 255, 0.92);
+  --prism-shadow: rgba(0, 0, 0, 0.18);
+  position: relative;
+  width: 100%;
+  aspect-ratio: 0.68;
+  isolation: isolate;
+}
+
+.prism-glass__crystal {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 18px 30px var(--prism-shadow));
+}
+
+.prism-glass__pyramid {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  clip-path: polygon(50% 1%, 93% 92%, 7% 92%);
+}
+
+.prism-glass__face {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.prism-glass__face--left {
+  clip-path: polygon(50% 1%, 50% 92%, 7% 92%);
+  background:
+    linear-gradient(
+      138deg,
+      rgba(255, 255, 255, 0.92) 0%,
+      rgba(220, 236, 255, 0.42) 22%,
+      rgba(150, 188, 240, 0.18) 48%,
+      rgba(72, 108, 176, 0.14) 74%,
+      rgba(36, 58, 108, 0.22) 100%
+    );
+}
+
+.prism-glass__face--right {
+  clip-path: polygon(50% 1%, 93% 92%, 50% 92%);
+  background:
+    linear-gradient(
+      222deg,
+      rgba(255, 255, 255, 0.62) 0%,
+      rgba(196, 216, 248, 0.24) 30%,
+      rgba(108, 142, 210, 0.12) 58%,
+      rgba(28, 48, 96, 0.24) 100%
+    );
+}
+
+.prism-glass__face--front {
+  clip-path: polygon(50% 1%, 61% 92%, 39% 92%);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.96) 0%,
+      rgba(236, 244, 255, 0.44) 38%,
+      rgba(176, 204, 246, 0.28) 72%,
+      rgba(120, 156, 220, 0.18) 100%
+    );
+  opacity: 0.88;
+}
+
+.prism-glass__ridge {
+  position: absolute;
+  pointer-events: none;
+  background: linear-gradient(180deg, var(--prism-edge), rgba(255, 255, 255, 0.18) 78%, transparent);
+  filter: blur(0.4px);
+}
+
+.prism-glass__ridge--left {
+  left: 28.5%;
+  top: 2%;
+  width: 1.8%;
+  height: 90%;
+  transform: skewX(-14deg);
+}
+
+.prism-glass__ridge--right {
+  right: 28.5%;
+  top: 2%;
+  width: 1.8%;
+  height: 90%;
+  transform: skewX(14deg);
+}
+
+.prism-glass__ridge--center {
+  left: 49.1%;
+  top: 1%;
+  width: 1.6%;
+  height: 91%;
+}
+
+.prism-glass__caustic {
+  position: absolute;
+  left: 22%;
+  bottom: 10%;
+  width: 56%;
+  height: 28%;
+  background: radial-gradient(ellipse, rgba(255, 255, 255, 0.72), rgba(180, 210, 255, 0.2) 42%, transparent 72%);
+  filter: blur(6px);
+  opacity: 0.72;
+  mix-blend-mode: soft-light;
+}
+
+.prism-glass__apex {
+  position: absolute;
+  left: 50%;
+  top: 0.5%;
+  width: 14%;
+  height: 8%;
+  transform: translate(-50%, -10%);
+  background: radial-gradient(circle, #fff 0%, rgba(255, 255, 255, 0.4) 42%, transparent 72%);
+  filter: blur(1px);
+  opacity: 0.95;
+}
+
+.prism-glass__specular {
+  position: absolute;
+  left: 47%;
+  top: 3%;
+  width: 6%;
+  height: 82%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.22) 62%, transparent 100%);
+  filter: blur(0.5px);
+  opacity: 0.78;
+  z-index: 3;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+.prism-glass__sheen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    118deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.42) 48%,
+    rgba(255, 255, 255, 0.06) 54%,
+    transparent 68%
+  );
+  clip-path: polygon(50% 1%, 93% 92%, 7% 92%);
+  opacity: 0.3;
+  z-index: 4;
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+  animation: prism-sheen 9s ease-in-out infinite;
+}
+
+.prism-glass__ground {
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  bottom: 2%;
+  height: 18%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(255, 255, 255, 0.58), var(--prism-tint) 44%, transparent 72%);
+  filter: blur(12px);
+  opacity: 0.68;
+  z-index: 0;
+}
+
+.prism-glass__halo {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 0;
+  height: 32%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(255, 255, 255, 0.55), var(--prism-tint) 40%, transparent 72%);
+  filter: blur(16px);
+  opacity: 0.72;
+  z-index: 1;
+}
+
+.prism-mark {
+  display: inline-block;
+  width: var(--mark-size);
+  height: calc(var(--mark-size) * 1.12);
+  flex: none;
+  overflow: visible;
+}
+
+.prism-mark .prism-glass {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+}
+
+.prism-glass__flare {
+  position: absolute;
+  left: 7%;
+  bottom: 5%;
+  width: 58%;
+  height: 11%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 57, 57, 0.58),
+    rgba(255, 212, 61, 0.56) 25%,
+    rgba(92, 234, 148, 0.44) 50%,
+    rgba(72, 134, 255, 0.54) 75%,
+    rgba(190, 90, 255, 0.5)
+  );
+  filter: blur(10px);
+  border-radius: 50%;
+  opacity: 0.9;
+  animation: flare-pulse 5s ease-in-out infinite;
+  z-index: 1;
+}
+
+@keyframes flare-pulse {
+  0%,
+  100% {
+    opacity: 0.65;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes prism-sheen {
+  0%,
+  100% {
+    transform: translateX(-8%) skewX(-8deg);
+    opacity: 0.2;
+  }
+
+  45% {
+    transform: translateX(10%) skewX(-8deg);
+    opacity: 0.46;
+  }
+}
+
+.prism-glass__emit {
+  position: absolute;
+  left: 52%;
+  top: 46%;
+  width: 220vw;
+  height: 5%;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.72) 0%,
+      var(--emit, rgba(255, 255, 255, 0.5)) 6%,
+      color-mix(in srgb, var(--emit, rgba(255, 255, 255, 0.5)) 78%, transparent) 28%,
+      color-mix(in srgb, var(--emit, rgba(255, 255, 255, 0.5)) 22%, transparent) 58%,
+      transparent 82%
+    );
+  filter: blur(5px);
+  opacity: var(--emit-opacity, 0);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.prism-glass__incoming {
+  position: absolute;
+  right: 64%;
+  top: 46.5%;
+  width: 0;
+  height: 0;
+  opacity: var(--incoming-opacity, 0);
+  transform: scaleX(var(--incoming-scale, 1));
+  transform-origin: right center;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.prism-glass__incoming::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: calc(145vw * clamp(0.1, var(--incoming-opacity, 0), 1));
+  height: calc(12vh + var(--incoming-opacity, 0) * 30vh);
+  transform: translateY(-50%);
+  transform-origin: right center;
+  clip-path: polygon(100% 50%, 0% 18%, 0% 82%);
+  background: linear-gradient(270deg, rgba(255, 255, 255, 0.98) 48%, rgba(255, 255, 255, 0.35) 72%, transparent);
+  box-shadow: 0 0 22px rgba(255, 255, 255, 0.55);
+  filter: blur(8px);
+}
+
+.prism-glass--projector .prism-glass__emit {
+  --emit: var(--emit-color, rgba(255, 255, 255, 0.55));
+  height: clamp(4px, 0.9vh, 10px);
+  filter: blur(4px);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--emit-color, rgba(228, 186, 88, 0.78)) 48%, transparent);
+  transform-origin: left center;
+}
+
+.prism-glass__beams {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 6;
+}
+
+.beam {
+  position: absolute;
+  transform-origin: left center;
+  opacity: 0.94;
+  --beam-scale: 1;
+  --fan-spread: calc(12% + var(--beam-scale) * 24%);
+}
+
+.beam--white {
+  top: 46.5%;
+  right: 64%;
+  width: 0;
+  height: 0;
+  transform-origin: right center;
+}
+
+.beam--white::before,
+.beam--white::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  transform-origin: right center;
+  pointer-events: none;
+}
+
+.beam--white::before {
+  width: calc(150vw * var(--beam-scale, 1));
+  height: calc(14vh + var(--beam-scale, 0) * 34vh);
+  transform: translate(0, -50%);
+  clip-path: polygon(100% 50%, 0% calc(50% - var(--fan-spread)), 0% calc(50% + var(--fan-spread)));
+  background: linear-gradient(270deg, transparent 0%, rgba(255, 255, 255, 0.42) 28%, rgba(255, 255, 255, 0.98) 78%);
+  filter: blur(10px);
+  box-shadow: 0 0 24px rgba(255, 255, 255, 0.55);
+}
+
+.beam--white::after {
+  width: calc(165vw * var(--beam-scale, 1));
+  height: calc(18vh + var(--beam-scale, 0) * 40vh);
+  transform: translate(0, -50%);
+  clip-path: polygon(100% 50%, 0% calc(50% - var(--fan-spread) - 4%), 0% calc(50% + var(--fan-spread) + 4%));
+  background: linear-gradient(270deg, transparent 0%, rgba(255, 255, 255, 0.12) 36%, rgba(255, 255, 255, 0.28) 72%);
+  filter: blur(28px);
+  opacity: 0.75;
+}
+
+.beam--red,
+.beam--blue,
+.beam--gold,
+.beam--purple {
+  left: 51%;
+  top: 47%;
+  width: 0;
+  height: 0;
+}
+
+.beam--gold::before,
+.beam--gold::after,
+.beam--red::before,
+.beam--red::after,
+.beam--blue::before,
+.beam--blue::after,
+.beam--purple::before,
+.beam--purple::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: left center;
+  pointer-events: none;
+}
+
+.beam--gold::before,
+.beam--red::before,
+.beam--blue::before,
+.beam--purple::before {
+  width: calc(210vw * var(--beam-scale, 1));
+  height: calc(16vh + var(--beam-scale, 0) * 40vh);
+  transform: translateY(-50%);
+  clip-path: polygon(0% 50%, 100% calc(50% - var(--fan-spread)), 100% calc(50% + var(--fan-spread)));
+  filter: blur(12px);
+}
+
+.beam--gold::after,
+.beam--red::after,
+.beam--blue::after,
+.beam--purple::after {
+  width: calc(230vw * var(--beam-scale, 1));
+  height: calc(20vh + var(--beam-scale, 0) * 46vh);
+  transform: translateY(-50%);
+  clip-path: polygon(0% 50%, 100% calc(50% - var(--fan-spread) - 5%), 100% calc(50% + var(--fan-spread) + 5%));
+  filter: blur(32px);
+  opacity: 0.55;
+}
+
+.beam--gold::before {
+  background: linear-gradient(90deg, rgba(246, 207, 62, 0.88) 0%, rgba(246, 207, 62, 0.48) 24%, rgba(246, 207, 62, 0.14) 58%, transparent 82%);
+}
+
+.beam--gold::after {
+  background: linear-gradient(90deg, rgba(246, 207, 62, 0.22) 0%, rgba(246, 207, 62, 0.08) 42%, transparent 84%);
+}
+
+.beam--red::before {
+  background: linear-gradient(90deg, rgba(255, 88, 72, 0.78) 0%, rgba(255, 88, 72, 0.34) 26%, rgba(255, 88, 72, 0.1) 58%, transparent 82%);
+}
+
+.beam--red::after {
+  background: linear-gradient(90deg, rgba(255, 88, 72, 0.18) 0%, rgba(255, 88, 72, 0.06) 42%, transparent 84%);
+}
+
+.beam--blue::before {
+  background: linear-gradient(90deg, rgba(72, 134, 255, 0.74) 0%, rgba(72, 134, 255, 0.32) 26%, rgba(72, 134, 255, 0.1) 58%, transparent 82%);
+}
+
+.beam--blue::after {
+  background: linear-gradient(90deg, rgba(72, 134, 255, 0.18) 0%, rgba(72, 134, 255, 0.06) 42%, transparent 84%);
+}
+
+.beam--purple::before {
+  background: linear-gradient(90deg, rgba(152, 80, 255, 0.72) 0%, rgba(152, 80, 255, 0.3) 26%, rgba(152, 80, 255, 0.1) 58%, transparent 82%);
+}
+
+.beam--purple::after {
+  background: linear-gradient(90deg, rgba(152, 80, 255, 0.18) 0%, rgba(152, 80, 255, 0.06) 42%, transparent 84%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prism-glass__flare,
+  .prism-glass__sheen {
+    animation: none;
+  }
+}
