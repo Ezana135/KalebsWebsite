@@ -327,17 +327,39 @@ export default function Journey() {
     const beam = beamRef.current;
     if (!root || !prism || !beam) return undefined;
 
+    const elements = {
+      opening: root.querySelector('.opening-scene'),
+      openingSlot: root.querySelector('.opening-scene__prism-slot'),
+      egoPassage: root.querySelector('#ego-passage'),
+      ego: root.querySelector('#ego'),
+      lovePassage: root.querySelector('#love-passage'),
+      love: root.querySelector('#love'),
+      reasonBlackout: root.querySelector('#reason-blackout'),
+      reason: root.querySelector('#reason'),
+      artBlackout: root.querySelector('#art-blackout'),
+      art: root.querySelector('#art'),
+    };
+
+    const stages = {
+      ego: root.querySelector('#ego .chapter-projector__stage'),
+      love: root.querySelector('#love .chapter-projector__stage'),
+      reason: root.querySelector('#reason .chapter-projector__stage'),
+      art: root.querySelector('#art .chapter-projector__stage'),
+    };
+
+    const openingTargets = {
+      gold: root.querySelector('.opening-scene__appendix-item--ego'),
+      blue: root.querySelector('.opening-scene__appendix-item--love'),
+      red: root.querySelector('.opening-scene__appendix-item--reason'),
+      purple: root.querySelector('.opening-scene__appendix-item--art'),
+    };
+
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const clamp01 = (v) => Math.min(1, Math.max(0, v));
     const lerp = (a, b, t) => a + (b - a) * t;
     const smoothstep = (t) => {
       const x = clamp01(t);
       return x * x * (3 - 2 * x);
-    };
-    const easeOut = (t) => 1 - (1 - clamp01(t)) ** 3;
-    const easeInOut = (t) => {
-      const x = clamp01(t);
-      return x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2;
     };
     const blend = (a, b, t) => ({
       x: lerp(a.x, b.x, t),
@@ -632,28 +654,24 @@ export default function Journey() {
       const scrollY = window.scrollY;
       const mobile = vw <= 720;
 
-      const opening = root.querySelector('.opening-scene');
-      const egoPassage = root.querySelector('#ego-passage');
-      const ego = root.querySelector('#ego');
-      const lovePassage = root.querySelector('#love-passage');
-      const love = root.querySelector('#love');
-      const reasonBlackout = root.querySelector('#reason-blackout');
-      const reasonEl = root.querySelector('#reason');
-      const artBlackout = root.querySelector('#art-blackout');
-      const artEl = root.querySelector('#art');
+      const {
+        opening,
+        openingSlot,
+        egoPassage,
+        ego,
+        lovePassage,
+        love,
+        reasonBlackout,
+        reason: reasonEl,
+        artBlackout,
+        art: artEl,
+      } = elements;
 
       const openingP = scrollSpan(opening).p;
       const projectorP = clamp01((openingP - 0.34) / 0.46);
       const beamP = clamp01((openingP - 0.52) / 0.38);
       const colorBeamP = clamp01((openingP - 0.58) / 0.36);
 
-      const egoPassageP = scrollSpan(egoPassage).p;
-      const egoP = scrollSpan(ego).p;
-      const lovePassageP = scrollSpan(lovePassage).p;
-      const loveP = scrollSpan(love).p;
-      const reasonBlackoutP = scrollSpan(reasonBlackout).p;
-      const reasonP = scrollSpan(reasonEl).p;
-      const artBlackoutP = scrollSpan(artBlackout).p;
       const artP = scrollSpan(artEl).p;
 
       const openingEnd = opening ? opening.offsetTop + opening.offsetHeight : 0;
@@ -717,8 +735,9 @@ export default function Journey() {
       let projectionP = 0;
       let blackOpacity = 0;
 
-      const openingSlot = root.querySelector('.opening-scene__prism-slot');
-      const slotRect = openingSlot?.getBoundingClientRect();
+      const slotRect = (zone === 'opening' || zone === 'exit-opening')
+        ? openingSlot?.getBoundingClientRect()
+        : null;
       const slotX = slotRect ? slotRect.left + slotRect.width / 2 : vw * 0.13;
       const slotY = slotRect ? slotRect.top + slotRect.height * 0.5 : vh * 0.53;
       const slotW = slotRect?.width ?? (mobile ? 118 : 168);
@@ -931,38 +950,6 @@ export default function Journey() {
       });
 
       if (!reduceMotion) {
-        const egoStateAt = (yPos = scrollY) => {
-          const egoState = egoSequence({
-            scrollY: yPos,
-            vh,
-            openingEnd,
-            openingEndX,
-            openingEndY,
-            openingEndW,
-            dockX,
-            dockPassageY,
-            dockW,
-            ego,
-          });
-          return packState({
-            x: egoState.x,
-            y: egoState.y,
-            w: egoState.w,
-            incoming: egoState.incoming,
-            emit: egoState.emit,
-            whiteBeam: egoState.whiteBeam,
-            spectrumBeam: egoState.spectrumBeam,
-            projectionP: egoState.projectionP,
-            isDocked: egoState.isDocked,
-            useSpectrum: egoState.useSpectrum,
-            theme: 'ego',
-            emitColor: EMIT_COLORS.ego,
-            blackOpacity: 0,
-            prismOpacity: 1,
-            isDark: false,
-          });
-        };
-
         const loveStateAt = (yPos = scrollY) => {
           const loveState = loveSequence({
             scrollY: yPos,
@@ -1150,26 +1137,19 @@ export default function Journey() {
       root.dataset.final = inArtSequence && artP >= 0.995 ? 'true' : 'false';
       document.body.dataset.journeyDark = isDark ? 'true' : 'false';
 
-      const prismH = w / 0.68;
       const emitX = x + w * 0.01;
-      const emitY = y - prismH * 0.03;
       let fanHeightPx = vh * 0.82;
 
       const stageByTheme = {
-        ego: '#ego .chapter-projector__stage',
-        love: '#love .chapter-projector__stage',
-        reason: '#reason .chapter-projector__stage',
-        art: '#art .chapter-projector__stage',
-        white: '#reason .chapter-projector__stage',
+        ...stages,
+        white: stages.reason,
       };
-      const activeStage = stageByTheme[theme] ? root.querySelector(stageByTheme[theme]) : null;
+      const activeStage = stageByTheme[theme] || null;
 
       if (isDocked && activeStage) {
-        const stageRect = activeStage.getBoundingClientRect();
-        if (stageRect.height > 0) {
-          const coverTop = Math.abs(stageRect.top - emitY);
-          const coverBottom = Math.abs(stageRect.bottom - emitY);
-          fanHeightPx = Math.max((coverTop + coverBottom) * 1.08, vh * 0.76);
+        const stageHeight = activeStage.offsetHeight;
+        if (stageHeight > 0) {
+          fanHeightPx = Math.max(stageHeight * 1.08, vh * 0.76);
         }
       } else if (chapterId === 'love-passage' || chapterId === 'ego-passage') {
         fanHeightPx = vh * 0.9;
@@ -1240,8 +1220,7 @@ export default function Journey() {
       root.style.setProperty('--projection-edge-x', `${renderProjectionEdgeX.toFixed(2)}px`);
       root.style.setProperty('--beam-reach', `${renderBeamReach.toFixed(2)}px`);
 
-      const aimBeamAt = (selector, cssVar) => {
-        const el = root.querySelector(selector);
+      const aimBeamAt = (el, cssVar) => {
         if (!el) return;
         const rect = el.getBoundingClientRect();
         const targetX = rect.left + 8;
@@ -1251,13 +1230,14 @@ export default function Journey() {
       };
 
       if (useSpectrum && (zone === 'opening' || zone === 'exit-opening')) {
-        aimBeamAt('.opening-scene__appendix-item--ego', '--beam-tilt-gold');
-        aimBeamAt('.opening-scene__appendix-item--love', '--beam-tilt-blue');
-        aimBeamAt('.opening-scene__appendix-item--reason', '--beam-tilt-red');
-        aimBeamAt('.opening-scene__appendix-item--art', '--beam-tilt-purple');
+        aimBeamAt(openingTargets.gold, '--beam-tilt-gold');
+        aimBeamAt(openingTargets.blue, '--beam-tilt-blue');
+        aimBeamAt(openingTargets.red, '--beam-tilt-red');
+        aimBeamAt(openingTargets.purple, '--beam-tilt-purple');
       }
 
       root.classList.toggle('is-spectrum-active', useSpectrum && (zone === 'opening' || zone === 'exit-opening'));
+      root.classList.toggle('is-projection-transition', renderProjectionP < 0.985);
 
       prism.style.setProperty('--prism-x', `${renderX.toFixed(2)}px`);
       prism.style.setProperty('--prism-y', `${renderY.toFixed(2)}px`);
@@ -1294,9 +1274,11 @@ export default function Journey() {
     };
 
     let raf = 0;
+    let settleFrames = 0;
     const tick = () => {
       update();
-      if (root.dataset.final !== 'true') {
+      settleFrames -= 1;
+      if (root.dataset.final !== 'true' && settleFrames > 0) {
         raf = requestAnimationFrame(tick);
       } else {
         raf = 0;
@@ -1304,10 +1286,11 @@ export default function Journey() {
     };
 
     const resume = () => {
+      settleFrames = reduceMotion ? 1 : 40;
       if (!raf) raf = requestAnimationFrame(tick);
     };
 
-    tick();
+    resume();
     window.addEventListener('scroll', resume, { passive: true });
     window.addEventListener('resize', resume);
     return () => {

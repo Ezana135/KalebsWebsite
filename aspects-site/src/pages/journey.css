@@ -35,6 +35,13 @@
   color: #f4efe8;
 }
 
+.journey:not(.is-projection-transition) .chapter-projector__stage,
+.journey:not(.is-projection-transition) .chapter-projector__wash,
+.journey:not(.is-projection-transition) .chapter-passage__wash {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
 .journey__blackout {
   position: fixed;
   inset: 0;
@@ -2342,6 +2349,14 @@ body[data-journey-dark='true'] .nav--journey {
 }
 
 @media (max-width: 1100px) {
+  .journey .journey-beam__wash {
+    display: none;
+  }
+
+  .journey .journey-beam__fan {
+    filter: blur(8px);
+  }
+
   .journey-shell {
     width: min(100% - 34px, 920px);
   }
